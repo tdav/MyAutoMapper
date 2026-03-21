@@ -1,0 +1,18 @@
+using MyAutoMapper.Parameters;
+
+namespace MyAutoMapper.Configuration;
+
+public abstract class MappingProfile
+{
+    internal List<ITypeMapConfiguration> TypeMaps { get; } = [];
+
+    protected ITypeMappingExpression<TSource, TDest> CreateMap<TSource, TDest>()
+    {
+        var builder = new TypeMapBuilder<TSource, TDest>();
+        TypeMaps.Add(builder);
+        return builder;
+    }
+
+    protected ParameterSlot<T> DeclareParameter<T>(string name)
+        => new(name);
+}

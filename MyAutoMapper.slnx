@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/MyAutoMapper/MyAutoMapper.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/MyAutoMapper.WebApiSample/MyAutoMapper.WebApiSample.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MyAutoMapper.Benchmarks/MyAutoMapper.Benchmarks.csproj" />
+    <Project Path="tests/MyAutoMapper.IntegrationTests/MyAutoMapper.IntegrationTests.csproj" />
+    <Project Path="tests/MyAutoMapper.UnitTests/MyAutoMapper.UnitTests.csproj" />
+  </Folder>
+</Solution>

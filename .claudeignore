@@ -1,0 +1,88 @@
+# ===== .NET Backend =====
+
+# Build output
+**/bin/
+**/obj/
+**/out/
+
+# NuGet
+**/packages/
+**/.nuget/
+
+# IDE / Editor
+**/.vs/
+**/.vscode/
+**/.idea/
+**/.rider/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs & temp
+**/logs/
+*.log
+*.tmp
+*.temp
+*.swp
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Database backups
+*.backup
+*.bak
+*.sql
+
+# Backup folders
+backup/
+
+# Images/media (binary)
+Images/
+
+# PowerShell reports (utility scripts)
+test_*.ps1
+check_*.ps1
+
+# EF Core migrations snapshots (large auto-generated)
+**/Migrations/*.Designer.cs
+**/Migrations/*ModelSnapshot.cs
+
+# ===== Vue 3 / TypeScript Frontend =====
+
+# Dependencies
+**/node_modules/
+
+# Build output
+**/dist/
+**/.output/
+**/.nuxt/
+
+# Cache
+**/.cache/
+**/.parcel-cache/
+**/.vite/
+
+# Environment files
+**/.env
+**/.env.*
+!**/.env.example
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Coverage
+**/coverage/
+
+# Lock files (large, not needed for code understanding)
+**/yarn.lock
+**/package-lock.json
+**/pnpm-lock.yaml
+
+# ===== Git worktrees =====
+.claude/worktrees/
+
+# ===== Misc =====
+conductor/

@@ -1,0 +1,58 @@
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace MyAutoMapper.Compilation.Conventions;
+
+internal sealed class FlatteningConvention : INameConvention
+{
+    public bool TryGetSourceExpression(
+        Type sourceType,
+        PropertyInfo destProperty,
+        ParameterExpression sourceParam,
+        out Expression? sourceExpression)
+    {
+        sourceExpression = TryFlatten(sourceType, destProperty.Name, destProperty.PropertyType, sourceParam);
+        return sourceExpression is not null;
+    }
+
+    private static Expression? TryFlatten(
+        Type currentType,
+        string remainingName,
+        Type destPropertyType,
+        Expression currentExpression,
+        int depth = 0)
+    {
+        if (string.IsNullOrEmpty(remainingName) || depth > 5)
+            return null;
+
+        var properties = currentType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        // Try each property as a prefix
+        foreach (var property in properties.OrderByDescending(p => p.Name.Length))
+        {
+            if (!remainingName.StartsWith(property.Name, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var propertyAccess = Expression.Property(currentExpression, property);
+            var remaining = remainingName[property.Name.Length..];
+
+            if (remaining.Length == 0)
+            {
+                // Full match — check type compatibility
+                if (destPropertyType.IsAssignableFrom(property.PropertyType))
+                    return propertyAccess;
+                continue;
+            }
+
+            // Try to continue flattening deeper
+            if (!property.PropertyType.IsValueType && property.PropertyType != typeof(string))
+            {
+                var deeper = TryFlatten(property.PropertyType, remaining, destPropertyType, propertyAccess, depth + 1);
+                if (deeper is not null)
+                    return deeper;
+            }
+        }
+
+        return null;
+    }
+}

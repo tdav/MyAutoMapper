@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet --version)",
+      "Bash(dotnet --list-sdks)",
+      "Bash(dotnet new:*)",
+      "Bash(ls C:/Works/MyAutoMapper/MyAutoMapper.sln*)",
+      "Bash(dotnet nuget:*)",
+      "Bash(dotnet package:*)",
+      "Bash(dotnet script:*)",
+      "Bash(/tmp/amtest/amtest.csproj:*)",
+      "Bash(dotnet run:*)",
+      "Bash(del \"C:\\\\Works\\\\MyAutoMapper\\\\tests\\\\MyAutoMapper.Benchmarks\\\\InMemoryMappingBenchmark.cs\")",
+      "Bash(ls -la \"C:\\\\Works\\\\MyAutoMapper\\\\samples\"\" 2>/dev/null || echo \"samples/ directory does not exist \")",
+      "Bash(pkill -f \"MyAutoMapper.WebApiSample\")"
+    ]
+  }
+}
