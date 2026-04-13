@@ -9,11 +9,17 @@ namespace SmAutoMapper.Extensions;
 public static class QueryableExtensions
 {
     private static readonly MethodInfo SelectDefinition =
-        typeof(Queryable).GetMethods()
-            .First(m => m.Name == "Select"
-                && m.GetParameters().Length == 2
-                && m.GetParameters()[1].ParameterType.GetGenericArguments()[0]
-                    .GetGenericArguments().Length == 2);
+        typeof(Queryable).GetMethod(
+            nameof(Queryable.Select),
+            genericParameterCount: 2,
+            types: new[]
+            {
+                typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)),
+                typeof(Expression<>).MakeGenericType(
+                    typeof(Func<,>).MakeGenericType(
+                        Type.MakeGenericMethodParameter(0),
+                        Type.MakeGenericMethodParameter(1)))
+            })!;
 
     private static readonly ConcurrentDictionary<(Type Source, Type Dest), MethodInfo> SelectCache = new();
 
@@ -26,9 +32,7 @@ public static class QueryableExtensions
     {
         var projection = ProjectionProviderAccessor.Instance
             .GetProjection(source.ElementType, typeof(TDest));
-        var select = GetSelectMethod(source.ElementType, typeof(TDest));
-        var call = Expression.Call(select, source.Expression, Expression.Quote(projection));
-        return source.Provider.CreateQuery<TDest>(call);
+        return BuildQuery<TDest>(source, projection);
     }
 
     public static IQueryable<TDest> ProjectTo<TDest>(
@@ -39,6 +43,12 @@ public static class QueryableExtensions
         parameters(binder);
         var projection = ProjectionProviderAccessor.Instance
             .GetProjection(source.ElementType, typeof(TDest), binder);
+        return BuildQuery<TDest>(source, projection);
+    }
+
+    private static IQueryable<TDest> BuildQuery<TDest>(
+        IQueryable source, LambdaExpression projection)
+    {
         var select = GetSelectMethod(source.ElementType, typeof(TDest));
         var call = Expression.Call(select, source.Expression, Expression.Quote(projection));
         return source.Provider.CreateQuery<TDest>(call);
