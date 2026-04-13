@@ -49,7 +49,16 @@ internal sealed class FlatteningConvention : INameConvention
             {
                 var deeper = TryFlatten(property.PropertyType, remaining, destPropertyType, propertyAccess, depth + 1);
                 if (deeper is not null)
-                    return deeper;
+                {
+                    var deeperExpr = deeper.Type != destPropertyType
+                        ? Expression.Convert(deeper, destPropertyType)
+                        : deeper;
+
+                    return Expression.Condition(
+                        Expression.Equal(propertyAccess, Expression.Constant(null, property.PropertyType)),
+                        Expression.Default(destPropertyType),
+                        deeperExpr);
+                }
             }
         }
 

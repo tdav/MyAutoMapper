@@ -78,6 +78,26 @@ public class ConventionMappingTests
     }
 
     [Fact]
+    public void Flattening_NullIntermediateProperty_ReturnsDefault()
+    {
+        var builder = new MappingConfigurationBuilder();
+        builder.AddProfile<FlatteningProfile>();
+        var config = builder.Build();
+        var mapper = config.CreateMapper();
+
+        var source = new SourceWithNested
+        {
+            Id = 2,
+            Address = null!
+        };
+        var dest = mapper.Map<SourceWithNested, FlatDest>(source);
+
+        dest.Id.Should().Be(2);
+        dest.AddressCity.Should().BeNull();
+        dest.AddressStreet.Should().BeNull();
+    }
+
+    [Fact]
     public void ReverseMap_CreatesReverseMapping()
     {
         var builder = new MappingConfigurationBuilder();
