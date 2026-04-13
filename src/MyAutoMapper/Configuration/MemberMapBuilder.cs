@@ -5,29 +5,23 @@ namespace MyAutoMapper.Configuration;
 
 internal sealed class MemberMapBuilder<TSource, TDest, TMember> : IMemberOptions<TSource, TDest, TMember>
 {
-    private readonly PropertyMap _propertyMap;
-
-    public MemberMapBuilder(PropertyMap propertyMap)
-    {
-        _propertyMap = propertyMap;
-    }
+    internal LambdaExpression? SourceExpression { get; private set; }
+    internal bool IsIgnored { get; private set; }
+    internal bool HasParameterizedSource { get; private set; }
+    internal IParameterSlot? ParameterSlot { get; private set; }
+    internal LambdaExpression? ParameterizedSourceExpression { get; private set; }
 
     public void MapFrom(Expression<Func<TSource, TMember>> sourceExpression)
-    {
-        _propertyMap.SourceExpression = sourceExpression;
-    }
+        => SourceExpression = sourceExpression;
 
     public void MapFrom<TParam>(
         ParameterSlot<TParam> parameter,
         Expression<Func<TSource, TParam, TMember>> sourceExpression)
     {
-        _propertyMap.HasParameterizedSource = true;
-        _propertyMap.ParameterSlot = parameter;
-        _propertyMap.ParameterizedSourceExpression = sourceExpression;
+        HasParameterizedSource = true;
+        ParameterSlot = parameter;
+        ParameterizedSourceExpression = sourceExpression;
     }
 
-    public void Ignore()
-    {
-        _propertyMap.IsIgnored = true;
-    }
+    public void Ignore() => IsIgnored = true;
 }

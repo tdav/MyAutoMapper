@@ -21,9 +21,15 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
         Action<IMemberOptions<TSource, TDest, TMember>> options)
     {
         var propertyInfo = ExtractPropertyInfo(destinationMember);
-        var propertyMap = new PropertyMap(propertyInfo);
-        var builder = new MemberMapBuilder<TSource, TDest, TMember>(propertyMap);
+        var builder = new MemberMapBuilder<TSource, TDest, TMember>();
         options(builder);
+        var propertyMap = new PropertyMap(
+            propertyInfo,
+            SourceExpression: builder.SourceExpression,
+            IsIgnored: builder.IsIgnored,
+            HasParameterizedSource: builder.HasParameterizedSource,
+            ParameterSlot: builder.ParameterSlot,
+            ParameterizedSourceExpression: builder.ParameterizedSourceExpression);
         _propertyMaps.Add(propertyMap);
         return this;
     }
@@ -33,7 +39,7 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
     {
         var propertyInfo = ExtractPropertyInfo(destinationMember);
         _ignoredMembers.Add(propertyInfo.Name);
-        var propertyMap = new PropertyMap(propertyInfo) { IsIgnored = true };
+        var propertyMap = new PropertyMap(propertyInfo, IsIgnored: true);
         _propertyMaps.Add(propertyMap);
         return this;
     }
@@ -66,12 +72,11 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
 
                 if (destPropertyOnReverse.CanWrite)
                 {
-                    var reversePropertyMap = new PropertyMap(destPropertyOnReverse);
                     var reverseSourceParam = Expression.Parameter(typeof(TDest), "src");
                     var reverseSourceExpr = Expression.Lambda(
                         Expression.Property(reverseSourceParam, sourcePropertyOnReverse),
                         reverseSourceParam);
-                    reversePropertyMap.SourceExpression = reverseSourceExpr;
+                    var reversePropertyMap = new PropertyMap(destPropertyOnReverse, SourceExpression: reverseSourceExpr);
                     _reverseMap._propertyMaps.Add(reversePropertyMap);
                 }
             }
