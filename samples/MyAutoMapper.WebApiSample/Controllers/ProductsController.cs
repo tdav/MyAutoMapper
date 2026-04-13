@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyAutoMapper.WebApiSample.Data;
-using MyAutoMapper.WebApiSample.Entities;
 using MyAutoMapper.WebApiSample.ViewModels;
 using SmAutoMapper.Extensions;
 
@@ -22,8 +21,7 @@ public class ProductsController(AppDbContext db) : ControllerBase
     public async Task<IActionResult> GetAll([FromQuery] string lang = "ru")
     {
         var products = await _db.Products
-            .ProjectTo<Product, ProductViewModel>(
-                p => p.Set("lang", lang))
+            .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
             .ToListAsync();
 
         return Ok(products);
@@ -38,8 +36,7 @@ public class ProductsController(AppDbContext db) : ControllerBase
     {
         var product = await _db.Products
             .Where(p => p.Id == id)
-            .ProjectTo<Product, ProductViewModel>(
-                p => p.Set("lang", lang))
+            .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
             .FirstOrDefaultAsync();
 
         if (product is null)
@@ -57,8 +54,7 @@ public class ProductsController(AppDbContext db) : ControllerBase
     {
         var products = await _db.Products
             .Where(p => p.CategoryId == categoryId)
-            .ProjectTo<Product, ProductViewModel>(
-                p => p.Set("lang", lang))
+            .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
             .ToListAsync();
 
         return Ok(products);
