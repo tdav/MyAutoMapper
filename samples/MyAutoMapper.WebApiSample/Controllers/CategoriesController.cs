@@ -32,8 +32,7 @@ public class CategoriesController : ControllerBase
         // 1. ProjectTo: EF Core selects only Id, LocalizedName, ParentId
         //    with @__lang_0 SQL parameter for localization
         var flatCategories = _db.Categories
-            .ProjectTo<Category, CategoryViewModel>(_projections,
-                p => p.Set("lang", lang))
+            .ProjectTo<CategoryViewModel>(p => p.Set("lang", lang))
             .ToList();
 
         // We need ParentId to build the tree, but CategoryViewModel doesn't have it.
@@ -80,5 +79,5 @@ public class CategoriesController : ControllerBase
         return Ok(categories);
     }
 
-    
+
 }
