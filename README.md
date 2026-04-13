@@ -322,6 +322,8 @@ dotnet run
 
 # Pack for NuGet
 dotnet pack -c Release
+
+dotnet pack src/MyAutoMapper/SmAutoMapper.csproj -c Release -o ./nupkg
 ```
 
 ## License
