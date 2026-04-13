@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>SmAutoMapper</AssemblyName>
     <PackageId>SmAutoMapper</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>T.Davron</Authors>
     <Company>T.Davron</Company>
     <Description>Lightweight object mapper with parameterized EF Core projections. Supports convention-based mapping, expression trees, ReverseMap, and runtime-parameterized LINQ projections for query plan reuse.</Description>
