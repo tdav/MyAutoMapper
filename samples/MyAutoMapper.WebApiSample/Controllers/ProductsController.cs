@@ -4,22 +4,14 @@ using MyAutoMapper.WebApiSample.Data;
 using MyAutoMapper.WebApiSample.Entities;
 using MyAutoMapper.WebApiSample.ViewModels;
 using SmAutoMapper.Extensions;
-using SmAutoMapper.Runtime;
 
 namespace MyAutoMapper.WebApiSample.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController : ControllerBase
+public class ProductsController(AppDbContext db) : ControllerBase
 {
-    private readonly AppDbContext _db;
-    private readonly IProjectionProvider _projections;
-
-    public ProductsController(AppDbContext db, IProjectionProvider projections)
-    {
-        _db = db;
-        _projections = projections;
-    }
+    private readonly AppDbContext _db = db;
 
     /// <summary>
     /// GET /api/products?lang=ru
@@ -30,7 +22,7 @@ public class ProductsController : ControllerBase
     public async Task<IActionResult> GetAll([FromQuery] string lang = "ru")
     {
         var products = await _db.Products
-            .ProjectTo<Product, ProductViewModel>(_projections,
+            .ProjectTo<Product, ProductViewModel>(
                 p => p.Set("lang", lang))
             .ToListAsync();
 
@@ -43,10 +35,11 @@ public class ProductsController : ControllerBase
     /// </summary>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "ru")
-    {
+    {        
+
         var product = await _db.Products
             .Where(p => p.Id == id)
-            .ProjectTo<Product, ProductViewModel>(_projections,
+            .ProjectTo<Product, ProductViewModel>(
                 p => p.Set("lang", lang))
             .FirstOrDefaultAsync();
 
@@ -65,7 +58,7 @@ public class ProductsController : ControllerBase
     {
         var products = await _db.Products
             .Where(p => p.CategoryId == categoryId)
-            .ProjectTo<Product, ProductViewModel>(_projections,
+            .ProjectTo<Product, ProductViewModel>(
                 p => p.Set("lang", lang))
             .ToListAsync();
 
