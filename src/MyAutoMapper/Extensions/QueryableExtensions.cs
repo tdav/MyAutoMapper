@@ -1,4 +1,3 @@
-using MyAutoMapper.Parameters;
 using SmAutoMapper.Parameters;
 using SmAutoMapper.Runtime;
 

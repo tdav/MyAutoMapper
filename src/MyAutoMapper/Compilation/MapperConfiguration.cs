@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using MyAutoMapper.Parameters;
 using SmAutoMapper.Configuration;
 using SmAutoMapper.Runtime;
 

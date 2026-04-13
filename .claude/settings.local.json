@@ -12,7 +12,10 @@
       "Bash(dotnet run:*)",
       "Bash(del \"C:\\\\Works\\\\MyAutoMapper\\\\tests\\\\MyAutoMapper.Benchmarks\\\\InMemoryMappingBenchmark.cs\")",
       "Bash(ls -la \"C:\\\\Works\\\\MyAutoMapper\\\\samples\"\" 2>/dev/null || echo \"samples/ directory does not exist \")",
-      "Bash(pkill -f \"MyAutoMapper.WebApiSample\")"
+      "Bash(pkill -f \"MyAutoMapper.WebApiSample\")",
+      "Bash(ls C:/Works/MyAutoMapper/LICENSE*)",
+      "Bash(dotnet pack:*)",
+      "Bash(dotnet clean:*)"
     ]
   }
 }

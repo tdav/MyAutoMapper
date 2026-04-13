@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using MyAutoMapper.Compilation;
-using MyAutoMapper.Configuration;
+using SmAutoMapper.Compilation;
+using SmAutoMapper.Configuration;
 using SmAutoMapper.Extensions;
 using SmAutoMapper.Runtime;
 

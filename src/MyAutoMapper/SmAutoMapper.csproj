@@ -3,13 +3,24 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>SmAutoMapper</AssemblyName>
+    <PackageId>SmAutoMapper</PackageId>
+    <Version>1.0.0</Version>
     <Authors>T.Davron</Authors>
-    <Description>Lightweight object mapper with parameterized EF Core projections</Description>
-    <PackageTags>mapper;automapper;efcore;expressions</PackageTags>
+    <Company>T.Davron</Company>
+    <Description>Lightweight object mapper with parameterized EF Core projections. Supports convention-based mapping, expression trees, ReverseMap, and runtime-parameterized LINQ projections for query plan reuse.</Description>
+    <PackageTags>mapper;object-mapper;automapper;efcore;expressions;linq;projection</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/tdav/MyAutoMapper</PackageProjectUrl>
     <RepositoryUrl>https://github.com/tdav/MyAutoMapper</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="MyAutoMapper.UnitTests" />
