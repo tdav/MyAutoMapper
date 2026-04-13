@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyAutoMapper.Extensions;
 using MyAutoMapper.Runtime;
 using MyAutoMapper.WebApiSample.Data;
@@ -26,12 +27,12 @@ public class ProductsController : ControllerBase
     /// EF Core generates SQL with @__lang_0 parameter (not inlined constant).
     /// </summary>
     [HttpGet]
-    public IActionResult GetAll([FromQuery] string lang = "ru")
+    public async Task<IActionResult> GetAll([FromQuery] string lang = "ru")
     {
-        var products = _db.Products
+        var products = await _db.Products
             .ProjectTo<Product, ProductViewModel>(_projections,
                 p => p.Set("lang", lang))
-            .ToList();
+            .ToListAsync();
 
         return Ok(products);
     }
@@ -41,13 +42,13 @@ public class ProductsController : ControllerBase
     /// Returns a single product with localized fields.
     /// </summary>
     [HttpGet("{id:int}")]
-    public IActionResult GetById(int id, [FromQuery] string lang = "ru")
+    public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "ru")
     {
-        var product = _db.Products
+        var product = await _db.Products
             .Where(p => p.Id == id)
             .ProjectTo<Product, ProductViewModel>(_projections,
                 p => p.Set("lang", lang))
-            .FirstOrDefault();
+            .FirstOrDefaultAsync();
 
         if (product is null)
             return NotFound();
@@ -60,13 +61,13 @@ public class ProductsController : ControllerBase
     /// Returns products filtered by category.
     /// </summary>
     [HttpGet("by-category/{categoryId:int}")]
-    public IActionResult GetByCategory(int categoryId, [FromQuery] string lang = "ru")
+    public async Task<IActionResult> GetByCategory(int categoryId, [FromQuery] string lang = "ru")
     {
-        var products = _db.Products
+        var products = await _db.Products
             .Where(p => p.CategoryId == categoryId)
             .ProjectTo<Product, ProductViewModel>(_projections,
                 p => p.Set("lang", lang))
-            .ToList();
+            .ToListAsync();
 
         return Ok(products);
     }
