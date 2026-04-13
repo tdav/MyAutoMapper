@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>ProjectTo</AssemblyName>
+    <Authors>T.Davron</Authors>
+    <Description>Lightweight object mapper with parameterized EF Core projections</Description>
+    <PackageTags>mapper;automapper;efcore;expressions</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/tdav/MyAutoMapper</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tdav/MyAutoMapper</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

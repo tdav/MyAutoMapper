@@ -886,6 +886,9 @@ dotnet run
 # Run benchmarks
 cd tests/MyAutoMapper.Benchmarks
 dotnet run -c Release -- --filter *
+
+dotnet pack -c Release
+dotnet nuget push bin/Release/MyAutoMapper.1.0.0.nupkg -k <ваш_api_key> -s https://api.nuget.org/v3/index.json
 ```
 
 ---
