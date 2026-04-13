@@ -15,7 +15,9 @@
       "Bash(pkill -f \"MyAutoMapper.WebApiSample\")",
       "Bash(ls C:/Works/MyAutoMapper/LICENSE*)",
       "Bash(dotnet pack:*)",
-      "Bash(dotnet clean:*)"
+      "Bash(dotnet clean:*)",
+      "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+      "mcp__plugin_context-mode_context-mode__ctx_execute"
     ]
   }
 }

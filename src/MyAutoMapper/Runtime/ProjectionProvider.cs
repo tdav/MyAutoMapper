@@ -54,4 +54,46 @@ public sealed class ProjectionProvider : IProjectionProvider
             holderType,
             newHolder);
     }
+
+    public LambdaExpression GetProjection(Type sourceType, Type destType)
+    {
+        var typeMap = _configuration.GetTypeMap(sourceType, destType);
+        return typeMap.ProjectionExpression
+            ?? throw new InvalidOperationException(
+                $"No projection expression compiled for {sourceType.Name} -> {destType.Name}.");
+    }
+
+    public LambdaExpression GetProjection(Type sourceType, Type destType, IParameterBinder parameters)
+    {
+        var typeMap = _configuration.GetTypeMap(sourceType, destType);
+
+        if (typeMap.ProjectionExpression is null)
+            throw new InvalidOperationException(
+                $"No projection expression compiled for {sourceType.Name} -> {destType.Name}.");
+
+        // If no parameterized mappings, return the cached expression as-is
+        if (typeMap.ClosureHolderType is null || typeMap.HolderPropertyMap is null)
+        {
+            return typeMap.ProjectionExpression;
+        }
+
+        // Create a new holder instance using the cached HolderPropertyMap (no runtime reflection)
+        var holderType = typeMap.ClosureHolderType;
+        var newHolder = Activator.CreateInstance(holderType)!;
+
+        foreach (var (name, value) in parameters.Values)
+        {
+            if (typeMap.HolderPropertyMap.TryGetValue(name, out var property))
+            {
+                // Allow null values — don't skip them
+                property.SetValue(newHolder, value);
+            }
+        }
+
+        // Use ClosureValueInjector to swap the holder constant in the expression
+        return ClosureValueInjector.InjectParameters(
+            typeMap.ProjectionExpression,
+            holderType,
+            newHolder);
+    }
 }
