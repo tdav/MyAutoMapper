@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using MyAutoMapper.Compilation;
 using MyAutoMapper.Configuration;
 
@@ -7,6 +8,13 @@ namespace MyAutoMapper.Validation;
 
 internal sealed class ConfigurationValidator
 {
+    private readonly ILogger<ConfigurationValidator>? _logger;
+
+    public ConfigurationValidator(ILogger<ConfigurationValidator>? logger = null)
+    {
+        _logger = logger;
+    }
+
     public void Validate(IReadOnlyCollection<TypeMap> typeMaps)
     {
         var errors = new List<string>();
@@ -22,7 +30,7 @@ internal sealed class ConfigurationValidator
         }
     }
 
-    private static void ValidateTypeMap(TypeMap typeMap, List<string> errors)
+    private void ValidateTypeMap(TypeMap typeMap, List<string> errors)
     {
         var sourceType = typeMap.TypePair.SourceType;
         var destType = typeMap.TypePair.DestinationType;
@@ -75,6 +83,9 @@ internal sealed class ConfigurationValidator
             // so we don't warn about properties that can be resolved by convention.
             // Only warn about truly unmappable properties as informational (not error).
             // This matches AutoMapper behavior — unmapped properties get default values.
+            _logger?.LogWarning(
+                "Mapping {Mapping}: destination property '{Property}' is not mapped and will receive default value",
+                mappingName, destProp.Name);
         }
     }
 

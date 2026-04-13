@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MyAutoMapper.Compilation;
 using MyAutoMapper.Configuration;
 using MyAutoMapper.Runtime;
@@ -25,7 +26,9 @@ public static class ServiceCollectionExtensions
         var configuration = builder.Build();
 
         // Validate all mappings eagerly
-        var validator = new ConfigurationValidator();
+        using var tempSp = services.BuildServiceProvider();
+        var logger = tempSp.GetService<ILoggerFactory>()?.CreateLogger<ConfigurationValidator>();
+        var validator = new ConfigurationValidator(logger);
         validator.Validate(configuration.GetAllTypeMaps());
 
         // Register as singletons
