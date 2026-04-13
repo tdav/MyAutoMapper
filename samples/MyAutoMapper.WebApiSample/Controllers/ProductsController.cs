@@ -35,8 +35,7 @@ public class ProductsController(AppDbContext db) : ControllerBase
     /// </summary>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "ru")
-    {        
-
+    {
         var product = await _db.Products
             .Where(p => p.Id == id)
             .ProjectTo<Product, ProductViewModel>(
