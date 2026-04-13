@@ -285,6 +285,22 @@ dotnet run -c Release -- --filter *SimpleMappingBenchmark*
 
 # Quick run (less accurate, 1-3 min)
 dotnet run -c Release -- --filter * --job short
+
+
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26200.8037)
+Unknown processor
+.NET SDK 10.0.201
+  [Host]     : .NET 10.0.5 (10.0.526.15411), X64 RyuJIT AVX2
+  DefaultJob : .NET 10.0.5 (10.0.526.15411), X64 RyuJIT AVX2
+
+Categories=Simple
+
+| Method       | Mean      | Error     | StdDev    | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+|------------- |----------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
+| Manual       |  3.491 ns | 0.0136 ns | 0.0113 ns |  1.00 |    0.00 | 0.0031 |      48 B |        1.00 |
+| Mapster      |  8.687 ns | 0.0659 ns | 0.0584 ns |  2.49 |    0.02 | 0.0031 |      48 B |        1.00 |
+| SmAutoMapper | 14.566 ns | 0.2508 ns | 0.2224 ns |  4.17 |    0.06 | 0.0030 |      48 B |        1.00 |
+| AutoMapper   | 25.699 ns | 0.0652 ns | 0.0578 ns |  7.36 |    0.03 | 0.0030 |      48 B |        1.00 |
 ```
 
 > **Important**: always run with `-c Release`. Debug builds produce inaccurate results.
