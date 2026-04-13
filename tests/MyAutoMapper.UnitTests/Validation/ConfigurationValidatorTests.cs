@@ -90,6 +90,73 @@ public class ConfigurationValidatorTests
         act.Should().NotThrow();
     }
 
+    // --- ReverseMap skipped-property models ---
+
+    private class ReverseSource
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Computed { get; set; } = "";
+        public string Parameterized { get; set; } = "";
+    }
+
+    private class ReverseDest
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Computed { get; set; } = "";
+        public string Parameterized { get; set; } = "";
+        public string Ignored { get; set; } = "";
+    }
+
+    private class ReverseMapWithSkipsProfile : MappingProfile
+    {
+        public ReverseMapWithSkipsProfile()
+        {
+            CreateMap<ReverseSource, ReverseDest>()
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Computed, o => o.MapFrom(s => s.Name + " " + s.Description)) // computed
+                .Ignore(d => d.Ignored) // ignored
+                .ReverseMap();
+        }
+    }
+
+    [Fact]
+    public void ReverseMap_SkippedProperties_AreTracked()
+    {
+        var builder = new MappingConfigurationBuilder();
+        builder.AddProfile<ReverseMapWithSkipsProfile>();
+        var configuration = builder.Build();
+
+        var configs = configuration.GetAllTypeMapConfigurations();
+
+        // The forward config (ReverseSource -> ReverseDest) should have skipped properties
+        var forwardConfig = configs.FirstOrDefault(c =>
+            c.SourceType == typeof(ReverseSource) && c.DestinationType == typeof(ReverseDest));
+
+        forwardConfig.Should().NotBeNull();
+        forwardConfig!.SkippedReverseProperties.Should().Contain(s => s.Contains("Computed") && s.Contains("computed"));
+        forwardConfig.SkippedReverseProperties.Should().Contain(s => s.Contains("Ignored") && s.Contains("ignored"));
+    }
+
+    [Fact]
+    public void Validate_ReverseMap_SkippedProperties_LogsWarning()
+    {
+        var builder = new MappingConfigurationBuilder();
+        builder.AddProfile<ReverseMapWithSkipsProfile>();
+        var configuration = builder.Build();
+
+        var logMessages = new List<string>();
+        var logger = new FakeLogger<ConfigurationValidator>(logMessages);
+        var validator = new ConfigurationValidator(logger);
+
+        validator.Validate(configuration.GetAllTypeMaps(), configuration.GetAllTypeMapConfigurations());
+
+        logMessages.Should().Contain(m => m.Contains("ReverseMap") && m.Contains("skipped"));
+    }
+
     /// <summary>
     /// Minimal fake logger that captures log messages for assertions.
     /// </summary>

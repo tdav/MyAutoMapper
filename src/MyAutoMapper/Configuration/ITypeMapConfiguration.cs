@@ -9,4 +9,5 @@ public interface ITypeMapConfiguration
     IReadOnlyList<PropertyMap> PropertyMaps { get; }
     LambdaExpression? CustomConstructor { get; }
     ITypeMapConfiguration? ReverseTypeMap { get; }
+    IReadOnlyList<string> SkippedReverseProperties { get; }
 }

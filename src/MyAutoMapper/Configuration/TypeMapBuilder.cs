@@ -7,6 +7,7 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
 {
     private readonly List<PropertyMap> _propertyMaps = [];
     private readonly HashSet<string> _ignoredMembers = [];
+    private readonly List<string> _skippedReverseProperties = [];
     private LambdaExpression? _customConstructor;
     private TypeMapBuilder<TDest, TSource>? _reverseMap;
 
@@ -15,6 +16,7 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
     public IReadOnlyList<PropertyMap> PropertyMaps => _propertyMaps;
     public LambdaExpression? CustomConstructor => _customConstructor;
     public ITypeMapConfiguration? ReverseTypeMap => _reverseMap;
+    public IReadOnlyList<string> SkippedReverseProperties => _skippedReverseProperties;
 
     public ITypeMappingExpression<TSource, TDest> ForMember<TMember>(
         Expression<Func<TDest, TMember>> destinationMember,
@@ -58,14 +60,30 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
         // Auto-configure reverse for simple property-to-property mappings
         foreach (var propertyMap in _propertyMaps)
         {
-            if (propertyMap.IsIgnored || propertyMap.HasParameterizedSource)
+            var propName = propertyMap.DestinationProperty.Name;
+
+            if (propertyMap.IsIgnored)
+            {
+                _skippedReverseProperties.Add($"{propName} (ignored)");
                 continue;
+            }
+
+            if (propertyMap.HasParameterizedSource)
+            {
+                _skippedReverseProperties.Add($"{propName} (parameterized)");
+                continue;
+            }
 
             if (propertyMap.SourceExpression is LambdaExpression sourceLambda
                 && sourceLambda.Body is MemberExpression memberExpr
-                && memberExpr.Member is PropertyInfo sourceProperty
-                && sourceProperty.CanWrite)
+                && memberExpr.Member is PropertyInfo sourceProperty)
             {
+                if (!sourceProperty.CanWrite)
+                {
+                    _skippedReverseProperties.Add($"{propName} (readonly)");
+                    continue;
+                }
+
                 // Simple property mapping: d.X = s.Y => reverse: d.Y = s.X
                 var destPropertyOnReverse = sourceProperty; // becomes destination in reverse
                 var sourcePropertyOnReverse = propertyMap.DestinationProperty; // becomes source in reverse
@@ -79,6 +97,10 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
                     var reversePropertyMap = new PropertyMap(destPropertyOnReverse, SourceExpression: reverseSourceExpr);
                     _reverseMap._propertyMaps.Add(reversePropertyMap);
                 }
+            }
+            else if (propertyMap.SourceExpression is not null)
+            {
+                _skippedReverseProperties.Add($"{propName} (computed)");
             }
         }
 

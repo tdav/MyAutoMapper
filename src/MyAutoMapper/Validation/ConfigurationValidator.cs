@@ -16,6 +16,9 @@ internal sealed class ConfigurationValidator
     }
 
     public void Validate(IReadOnlyCollection<TypeMap> typeMaps)
+        => Validate(typeMaps, Array.Empty<ITypeMapConfiguration>());
+
+    public void Validate(IReadOnlyCollection<TypeMap> typeMaps, IReadOnlyCollection<ITypeMapConfiguration> configs)
     {
         var errors = new List<string>();
 
@@ -27,6 +30,18 @@ internal sealed class ConfigurationValidator
         if (errors.Count > 0)
         {
             throw new MappingValidationException(errors);
+        }
+
+        // Log warnings for skipped reverse-map properties
+        foreach (var config in configs)
+        {
+            if (config.SkippedReverseProperties.Count > 0)
+            {
+                var mappingName = $"{config.SourceType.Name} -> {config.DestinationType.Name}";
+                _logger?.LogWarning(
+                    "ReverseMap {Mapping}: properties [{Properties}] were skipped (computed/parameterized/readonly)",
+                    mappingName, string.Join(", ", config.SkippedReverseProperties));
+            }
         }
     }
 

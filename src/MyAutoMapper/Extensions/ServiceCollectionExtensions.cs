@@ -29,7 +29,7 @@ public static class ServiceCollectionExtensions
         using var tempSp = services.BuildServiceProvider();
         var logger = tempSp.GetService<ILoggerFactory>()?.CreateLogger<ConfigurationValidator>();
         var validator = new ConfigurationValidator(logger);
-        validator.Validate(configuration.GetAllTypeMaps());
+        validator.Validate(configuration.GetAllTypeMaps(), configuration.GetAllTypeMapConfigurations());
 
         // Register as singletons
         services.AddSingleton(configuration);

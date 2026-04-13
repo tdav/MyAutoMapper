@@ -8,6 +8,7 @@ namespace MyAutoMapper.Compilation;
 public sealed class MapperConfiguration
 {
     private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMaps = new();
+    private readonly List<ITypeMapConfiguration> _typeMapConfigs = [];
     private readonly ProjectionCompiler _projectionCompiler = new();
     private readonly InMemoryCompiler _inMemoryCompiler = new();
 
@@ -18,11 +19,13 @@ public sealed class MapperConfiguration
             foreach (var typeMapConfig in profile.TypeMaps)
             {
                 BuildAndRegisterTypeMap(typeMapConfig);
+                _typeMapConfigs.Add(typeMapConfig);
 
                 // Also register reverse map if configured
                 if (typeMapConfig.ReverseTypeMap is not null)
                 {
                     BuildAndRegisterTypeMap(typeMapConfig.ReverseTypeMap);
+                    _typeMapConfigs.Add(typeMapConfig.ReverseTypeMap);
                 }
             }
         }
@@ -50,6 +53,8 @@ public sealed class MapperConfiguration
     public IProjectionProvider CreateProjectionProvider() => new ProjectionProvider(this);
 
     internal IReadOnlyCollection<TypeMap> GetAllTypeMaps() => _typeMaps.Values.ToList();
+
+    internal IReadOnlyCollection<ITypeMapConfiguration> GetAllTypeMapConfigurations() => _typeMapConfigs;
 
     private void BuildAndRegisterTypeMap(ITypeMapConfiguration typeMapConfig)
     {
