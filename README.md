@@ -42,6 +42,27 @@ Only external dependency: `Microsoft.Extensions.DependencyInjection.Abstractions
 | **Eager validation** | All mappings validated at startup; throws immediately with the full list of issues |
 | **DI integration** | `services.AddMapping()` with assembly scanning and singleton registration |
 
+## Quick Start
+
+```csharp
+// 1. Register in DI (Program.cs)
+builder.Services.AddMapping(typeof(Program).Assembly);
+
+// 2. Use in any class — no injection needed!
+var products = await _db.Products
+    .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
+    .ToListAsync();
+
+// Or without parameters:
+var categories = await _db.Categories
+    .ProjectTo<CategoryDto>()
+    .ToListAsync();
+```
+
+No need to inject `IProjectionProvider` — it resolves automatically via a static accessor configured at startup.
+
+---
+
 ## Requirements
 
 - .NET 10 SDK (10.0.201+)
@@ -91,11 +112,12 @@ MyAutoMapper/
 │   │   ├── Mapper.cs                      # Compiled delegate invocation
 │   │   ├── IProjectionProvider.cs         # Projection provider interface
 │   │   ├── ProjectionProvider.cs          # Expression delivery + parameter injection
+│   │   ├── ProjectionProviderAccessor.cs  # Static singleton for implicit resolution
 │   │   └── MappingContext.cs              # Key/value context
 │   │
 │   ├── Extensions/                        # Extension methods
 │   │   ├── ServiceCollectionExtensions.cs # AddMapping() for DI
-│   │   └── QueryableExtensions.cs         # ProjectTo<S,D>() for IQueryable
+│   │   └── QueryableExtensions.cs         # ProjectTo<TDest>() for IQueryable
 │   │
 │   └── Validation/                        # Configuration validation
 │       ├── ConfigurationValidator.cs      # Type compatibility checks
@@ -442,16 +464,25 @@ What it does:
 
 #### QueryableExtensions
 
-```csharp
-// Without parameters
-source.ProjectTo<Product, ProductDto>(projections);
+Three levels of API, from simplest to most explicit:
 
-// With parameters
-source.ProjectTo<Product, ProductDto>(projections,
-    p => p.Set("lang", "ru"));
+```csharp
+// 1. Single generic parameter (recommended) — TSource inferred at runtime
+source.ProjectTo<ProductDto>();
+source.ProjectTo<ProductDto>(p => p.Set("lang", "ru"));
+
+// 2. Two generic parameters — TSource explicit, no DI injection needed
+source.ProjectTo<Product, ProductDto>();
+source.ProjectTo<Product, ProductDto>(p => p.Set("lang", "ru"));
+
+// 3. Explicit provider — full control, useful for testing
+source.ProjectTo<Product, ProductDto>(projectionProvider);
+source.ProjectTo<Product, ProductDto>(projectionProvider, p => p.Set("lang", "ru"));
 ```
 
-Internally calls `provider.GetProjection<S, D>()` and `source.Select(expression)`.
+Options 1 and 2 use a static `ProjectionProviderAccessor` initialized at `AddMapping()`. Option 3 accepts an explicit `IProjectionProvider` for backward compatibility and testability.
+
+The single-generic overloads cache `Queryable.Select` `MethodInfo` per `(TSource, TDest)` pair via `ConcurrentDictionary` for optimal performance.
 
 ---
 
@@ -513,10 +544,10 @@ mapper.Map<Product, ProductDto>(product)
   → TypeMap.CompiledDelegate → (Func<Product, ProductDto>)(product) → dto
 
 // EF Core
-dbContext.Products.ProjectTo<Product, ProductDto>(projections)
-  → provider.GetProjection<Product, ProductDto>()
-  → Expression<Func<Product, ProductDto>>
-  → source.Select(expression)
+dbContext.Products.ProjectTo<ProductDto>()
+  → ProjectionProviderAccessor.Instance.GetProjection(source.ElementType, typeof(ProductDto))
+  → LambdaExpression
+  → Expression.Call(Queryable.Select, ...) via cached MethodInfo
   → EF Core translates to SQL:
     SELECT [p].[Title] AS [Name], [p].[Id], [p].[Price] FROM [Products] AS [p]
 ```
@@ -556,8 +587,7 @@ This is the library's key innovation. Common approaches (string interpolation, c
 
 ```
 1. User:
-   dbContext.Products.ProjectTo<Product, ProductViewModel>(projections,
-       p => p.Set("lang", "ru"))
+   dbContext.Products.ProjectTo<ProductViewModel>(p => p.Set("lang", "ru"))
 
 2. ParameterBinder: { "lang": "ru" }
 
@@ -693,7 +723,9 @@ builder.Services.AddMapping(
 Registers as **Singleton**:
 - `MapperConfiguration` — frozen configuration
 - `IMapper` — stateless mapper
-- `IProjectionProvider` — projection provider
+- `IProjectionProvider` — projection provider + static `ProjectionProviderAccessor`
+
+The static accessor is initialized eagerly during `AddMapping()`, enabling `ProjectTo<TDest>()` calls without explicit DI injection.
 
 All mappings are validated at registration. On errors: `MappingValidationException` with the full list of issues.
 
@@ -729,16 +761,17 @@ public class ProductMappingProfile : MappingProfile
 
 ```csharp
 [HttpGet]
-public IActionResult GetAll([FromQuery] string lang = "ru")
+public async Task<IActionResult> GetAll([FromQuery] string lang = "ru")
 {
-    var products = _db.Products
-        .ProjectTo<Product, ProductViewModel>(_projections,
-            p => p.Set("lang", lang))
-        .ToList();
+    var products = await _db.Products
+        .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
+        .ToListAsync();
 
     return Ok(products);
 }
 ```
+
+No need to inject `IProjectionProvider` — the static accessor resolves it automatically.
 
 ### Program.cs
 
