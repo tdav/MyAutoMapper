@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using MyAutoMapper.Compilation.Conventions;
-using MyAutoMapper.Configuration;
-using MyAutoMapper.Parameters;
+using SmAutoMapper.Compilation.Conventions;
+using SmAutoMapper.Configuration;
+using SmAutoMapper.Parameters;
 
-namespace MyAutoMapper.Compilation;
+namespace SmAutoMapper.Compilation;
 
 internal sealed class ProjectionCompiler
 {

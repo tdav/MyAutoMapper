@@ -1,7 +1,8 @@
 using MyAutoMapper.Parameters;
-using MyAutoMapper.Runtime;
+using SmAutoMapper.Parameters;
+using SmAutoMapper.Runtime;
 
-namespace MyAutoMapper.Extensions;
+namespace SmAutoMapper.Extensions;
 
 public static class QueryableExtensions
 {

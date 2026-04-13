@@ -4,7 +4,8 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using Mapster;
 using Microsoft.Extensions.Logging.Abstractions;
-using MyAutoMapper.Configuration;
+using SmAutoMapper.Configuration;
+using SmAutoMapper.Runtime;
 
 namespace MyAutoMapper.Benchmarks;
 
@@ -14,7 +15,7 @@ namespace MyAutoMapper.Benchmarks;
 [CategoriesColumn]
 public class SimpleMappingBenchmark
 {
-    private Runtime.IMapper _myMapper = null!;
+    private IMapper _myMapper = null!;
     private global::AutoMapper.IMapper _autoMapper = null!;
     private SimpleSource _source = null!;
 

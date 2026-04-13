@@ -1,6 +1,6 @@
-using MyAutoMapper.Compilation;
+using SmAutoMapper.Compilation;
 
-namespace MyAutoMapper.Runtime;
+namespace SmAutoMapper.Runtime;
 
 public sealed class Mapper : IMapper
 {

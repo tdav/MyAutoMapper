@@ -1,6 +1,6 @@
-using MyAutoMapper.Parameters;
+using SmAutoMapper.Parameters;
 
-namespace MyAutoMapper.Configuration;
+namespace SmAutoMapper.Configuration;
 
 public abstract class MappingProfile
 {

@@ -1,4 +1,4 @@
-namespace MyAutoMapper.Runtime;
+namespace SmAutoMapper.Runtime;
 
 public interface IMapper
 {

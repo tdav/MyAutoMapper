@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Collections.Concurrent;
 
-namespace MyAutoMapper.Parameters;
+namespace SmAutoMapper.Parameters;
 
 internal sealed class ClosureHolderFactory
 {

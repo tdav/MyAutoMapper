@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using MyAutoMapper.Compilation;
-using MyAutoMapper.Parameters;
+using SmAutoMapper.Compilation;
+using SmAutoMapper.Parameters;
 
-namespace MyAutoMapper.Runtime;
+namespace SmAutoMapper.Runtime;
 
 public sealed class ProjectionProvider : IProjectionProvider
 {

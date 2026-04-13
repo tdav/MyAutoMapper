@@ -1,6 +1,6 @@
 using FluentAssertions;
-using MyAutoMapper.Configuration;
-using MyAutoMapper.Runtime;
+using SmAutoMapper.Configuration;
+using SmAutoMapper.Runtime;
 
 namespace MyAutoMapper.UnitTests.Runtime;
 

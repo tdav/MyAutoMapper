@@ -1,7 +1,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using MyAutoMapper.Configuration;
 using MyAutoMapper.Validation;
+using SmAutoMapper.Configuration;
+using SmAutoMapper.Validation;
 
 namespace MyAutoMapper.UnitTests.Validation;
 

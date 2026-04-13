@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace MyAutoMapper.Compilation.Conventions;
+namespace SmAutoMapper.Compilation.Conventions;
 
 internal sealed class FlatteningConvention : INameConvention
 {

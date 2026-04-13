@@ -1,10 +1,11 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
-using MyAutoMapper.Compilation;
-using MyAutoMapper.Configuration;
+using MyAutoMapper.Validation;
+using SmAutoMapper.Compilation;
+using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.Validation;
+namespace SmAutoMapper.Validation;
 
 internal sealed class ConfigurationValidator
 {

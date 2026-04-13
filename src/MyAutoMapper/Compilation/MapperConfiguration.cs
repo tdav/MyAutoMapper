@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
-using MyAutoMapper.Configuration;
 using MyAutoMapper.Parameters;
-using MyAutoMapper.Runtime;
+using SmAutoMapper.Configuration;
+using SmAutoMapper.Runtime;
 
-namespace MyAutoMapper.Compilation;
+namespace SmAutoMapper.Compilation;
 
 public sealed class MapperConfiguration
 {

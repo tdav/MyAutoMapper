@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using MyAutoMapper.Compilation;
-using MyAutoMapper.Extensions;
-using MyAutoMapper.Runtime;
+using SmAutoMapper.Compilation;
+using SmAutoMapper.Extensions;
+using SmAutoMapper.Runtime;
 
 namespace MyAutoMapper.IntegrationTests.DependencyInjection;
 

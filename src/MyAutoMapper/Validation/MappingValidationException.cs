@@ -1,4 +1,4 @@
-namespace MyAutoMapper.Validation;
+namespace SmAutoMapper.Validation;
 
 public sealed class MappingValidationException : Exception
 {

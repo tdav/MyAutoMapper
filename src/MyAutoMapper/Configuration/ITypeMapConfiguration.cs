@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace MyAutoMapper.Configuration;
+namespace SmAutoMapper.Configuration;
 
 public interface ITypeMapConfiguration
 {

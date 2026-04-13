@@ -3,7 +3,7 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/MyAutoMapper/MyAutoMapper.csproj" />
+    <Project Path="src/MyAutoMapper/SmAutoMapper.csproj" />
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/MyAutoMapper.WebApiSample/MyAutoMapper.WebApiSample.csproj" />

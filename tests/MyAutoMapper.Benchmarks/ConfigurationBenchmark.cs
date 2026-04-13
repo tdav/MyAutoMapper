@@ -2,7 +2,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Mapster;
 using Microsoft.Extensions.Logging.Abstractions;
-using MyAutoMapper.Configuration;
+using SmAutoMapper.Configuration;
 
 namespace MyAutoMapper.Benchmarks;
 

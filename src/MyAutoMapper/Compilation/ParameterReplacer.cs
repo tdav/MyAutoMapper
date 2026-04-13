@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace MyAutoMapper.Compilation;
+namespace SmAutoMapper.Compilation;
 
 internal sealed class ParameterReplacer : ExpressionVisitor
 {

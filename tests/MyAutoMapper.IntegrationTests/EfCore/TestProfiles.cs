@@ -1,5 +1,5 @@
-using MyAutoMapper.Configuration;
 using MyAutoMapper.Parameters;
+using SmAutoMapper.Configuration;
 
 namespace MyAutoMapper.IntegrationTests.EfCore;
 

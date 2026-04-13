@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using MyAutoMapper.Parameters;
+using SmAutoMapper.Parameters;
 
-namespace MyAutoMapper.Configuration;
+namespace SmAutoMapper.Configuration;
 
 internal sealed class MemberMapBuilder<TSource, TDest, TMember> : IMemberOptions<TSource, TDest, TMember>
 {

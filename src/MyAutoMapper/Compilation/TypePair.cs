@@ -1,4 +1,4 @@
-namespace MyAutoMapper.Compilation;
+namespace SmAutoMapper.Compilation;
 
 public readonly record struct TypePair(Type SourceType, Type DestinationType)
 {

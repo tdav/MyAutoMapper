@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using MyAutoMapper.Parameters;
+using SmAutoMapper.Parameters;
 
-namespace MyAutoMapper.Runtime;
+namespace SmAutoMapper.Runtime;
 
 public interface IProjectionProvider
 {

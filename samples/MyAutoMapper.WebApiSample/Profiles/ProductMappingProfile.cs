@@ -1,6 +1,6 @@
-using MyAutoMapper.Configuration;
 using MyAutoMapper.WebApiSample.Entities;
 using MyAutoMapper.WebApiSample.ViewModels;
+using SmAutoMapper.Configuration;
 
 namespace MyAutoMapper.WebApiSample.Profiles;
 

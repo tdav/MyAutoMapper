@@ -2,8 +2,8 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using MyAutoMapper.Compilation;
 using MyAutoMapper.Configuration;
-using MyAutoMapper.Extensions;
-using MyAutoMapper.Runtime;
+using SmAutoMapper.Extensions;
+using SmAutoMapper.Runtime;
 
 namespace MyAutoMapper.IntegrationTests.EfCore;
 

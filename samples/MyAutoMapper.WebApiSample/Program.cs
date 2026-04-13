@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MyAutoMapper.Extensions;
 using MyAutoMapper.WebApiSample.Data;
 using MyAutoMapper.WebApiSample.Profiles;
+using SmAutoMapper.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

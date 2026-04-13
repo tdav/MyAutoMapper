@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace MyAutoMapper.Configuration;
+namespace SmAutoMapper.Configuration;
 
 internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TSource, TDest>, ITypeMapConfiguration
 {

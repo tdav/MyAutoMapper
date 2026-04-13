@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using MyAutoMapper.Extensions;
-using MyAutoMapper.Runtime;
 using MyAutoMapper.WebApiSample.Data;
 using MyAutoMapper.WebApiSample.Entities;
 using MyAutoMapper.WebApiSample.ViewModels;
+using SmAutoMapper.Extensions;
+using SmAutoMapper.Runtime;
 
 namespace MyAutoMapper.WebApiSample.Controllers;
 

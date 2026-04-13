@@ -1,12 +1,12 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MyAutoMapper.Compilation;
-using MyAutoMapper.Configuration;
-using MyAutoMapper.Runtime;
-using MyAutoMapper.Validation;
+using SmAutoMapper.Compilation;
+using SmAutoMapper.Configuration;
+using SmAutoMapper.Runtime;
+using SmAutoMapper.Validation;
 
-namespace MyAutoMapper.Extensions;
+namespace SmAutoMapper.Extensions;
 
 public static class ServiceCollectionExtensions
 {

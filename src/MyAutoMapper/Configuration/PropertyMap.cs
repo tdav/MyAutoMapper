@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using MyAutoMapper.Parameters;
+using SmAutoMapper.Parameters;
 
-namespace MyAutoMapper.Configuration;
+namespace SmAutoMapper.Configuration;
 
 public sealed record PropertyMap(
     PropertyInfo DestinationProperty,

@@ -1,4 +1,4 @@
-namespace MyAutoMapper.Parameters;
+namespace SmAutoMapper.Parameters;
 
 public interface IParameterSlot
 {

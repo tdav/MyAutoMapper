@@ -1,5 +1,5 @@
 using FluentAssertions;
-using MyAutoMapper.Configuration;
+using SmAutoMapper.Configuration;
 
 namespace MyAutoMapper.UnitTests.Conventions;
 

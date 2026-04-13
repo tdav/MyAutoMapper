@@ -1,7 +1,7 @@
 using System.Reflection;
-using MyAutoMapper.Compilation;
+using SmAutoMapper.Compilation;
 
-namespace MyAutoMapper.Configuration;
+namespace SmAutoMapper.Configuration;
 
 public sealed class MappingConfigurationBuilder
 {
