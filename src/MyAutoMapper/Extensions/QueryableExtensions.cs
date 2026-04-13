@@ -27,7 +27,6 @@ public static class QueryableExtensions
         => SelectCache.GetOrAdd((sourceType, destType),
             key => SelectDefinition.MakeGenericMethod(key.Source, key.Dest));
 
-
     public static IQueryable<TDest> ProjectTo<TDest>(this IQueryable source)
     {
         var projection = ProjectionProviderAccessor.Instance
@@ -69,7 +68,6 @@ public static class QueryableExtensions
         var expression = ProjectionProviderAccessor.Instance.GetProjection<TSource, TDest>(binder);
         return source.Select(expression);
     }
-
 
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
         this IQueryable<TSource> source,
