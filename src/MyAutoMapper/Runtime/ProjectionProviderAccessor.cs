@@ -2,7 +2,7 @@ namespace SmAutoMapper.Runtime;
 
 public static class ProjectionProviderAccessor
 {
-    private static IProjectionProvider? _instance;
+    private static volatile IProjectionProvider? _instance;
 
     internal static void SetInstance(IProjectionProvider provider)
     {
