@@ -34,7 +34,12 @@ public static class ServiceCollectionExtensions
         // Register as singletons
         services.AddSingleton(configuration);
         services.AddSingleton<IMapper>(sp => sp.GetRequiredService<MapperConfiguration>().CreateMapper());
-        services.AddSingleton<IProjectionProvider>(sp => sp.GetRequiredService<MapperConfiguration>().CreateProjectionProvider());
+        services.AddSingleton<IProjectionProvider>(sp =>
+        {
+            var provider = sp.GetRequiredService<MapperConfiguration>().CreateProjectionProvider();
+            ProjectionProviderAccessor.SetInstance(provider);
+            return provider;
+        });
 
         return services;
     }
