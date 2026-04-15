@@ -13,6 +13,7 @@ public sealed class TypeMap
     public Delegate? CompiledDelegate { get; }
     public LambdaExpression? CustomConstructor { get; }
     public IReadOnlyList<IParameterSlot> DeclaredParameters { get; }
+    public int? MaxDepth { get; }
 
     // Stores the closure holder type info for parameterized projections (immutable after construction)
     public Type? ClosureHolderType { get; }
@@ -28,7 +29,8 @@ public sealed class TypeMap
         Delegate? compiledDelegate,
         Type? closureHolderType,
         object? defaultClosureHolder,
-        IReadOnlyDictionary<string, PropertyInfo>? holderPropertyMap)
+        IReadOnlyDictionary<string, PropertyInfo>? holderPropertyMap,
+        int? maxDepth)
     {
         TypePair = typePair;
         PropertyMaps = propertyMaps;
@@ -39,6 +41,7 @@ public sealed class TypeMap
         ClosureHolderType = closureHolderType;
         DefaultClosureHolder = defaultClosureHolder;
         HolderPropertyMap = holderPropertyMap;
+        MaxDepth = maxDepth;
     }
 }
 

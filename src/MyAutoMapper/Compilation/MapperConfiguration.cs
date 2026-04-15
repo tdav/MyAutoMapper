@@ -13,20 +13,32 @@ public sealed class MapperConfiguration
 
     internal MapperConfiguration(IReadOnlyList<MappingProfile> profiles)
     {
+        // Phase 1: collect all ITypeMapConfiguration and build catalog
+        var allConfigs = new List<ITypeMapConfiguration>();
         foreach (var profile in profiles)
         {
-            foreach (var typeMapConfig in profile.TypeMaps)
+            foreach (var cfg in profile.TypeMaps)
             {
-                BuildAndRegisterTypeMap(typeMapConfig);
-                _typeMapConfigs.Add(typeMapConfig);
-
-                // Also register reverse map if configured
-                if (typeMapConfig.ReverseTypeMap is not null)
-                {
-                    BuildAndRegisterTypeMap(typeMapConfig.ReverseTypeMap);
-                    _typeMapConfigs.Add(typeMapConfig.ReverseTypeMap);
-                }
+                allConfigs.Add(cfg);
+                if (cfg.ReverseTypeMap is not null)
+                    allConfigs.Add(cfg.ReverseTypeMap);
             }
+        }
+
+        // Use indexer assignment (last-wins) instead of ToDictionary to preserve
+        // pre-existing silent override semantics of `_typeMaps[typePair] = typeMap`
+        // when the same TypePair is registered across multiple profiles (e.g.
+        // CreateMap<A,B>().ReverseMap() in one profile + CreateMap<B,A>() in another).
+        var catalogDict = new Dictionary<TypePair, ITypeMapConfiguration>();
+        foreach (var c in allConfigs)
+            catalogDict[new TypePair(c.SourceType, c.DestinationType)] = c;
+        IReadOnlyDictionary<TypePair, ITypeMapConfiguration> catalog = catalogDict;
+
+        // Phase 2: compilation
+        foreach (var cfg in allConfigs)
+        {
+            _typeMapConfigs.Add(cfg);
+            BuildAndRegisterTypeMap(cfg, catalog);
         }
     }
 
@@ -55,7 +67,9 @@ public sealed class MapperConfiguration
 
     internal IReadOnlyCollection<ITypeMapConfiguration> GetAllTypeMapConfigurations() => _typeMapConfigs;
 
-    private void BuildAndRegisterTypeMap(ITypeMapConfiguration typeMapConfig)
+    private void BuildAndRegisterTypeMap(
+        ITypeMapConfiguration typeMapConfig,
+        IReadOnlyDictionary<TypePair, ITypeMapConfiguration> catalog)
     {
         var typePair = new TypePair(typeMapConfig.SourceType, typeMapConfig.DestinationType);
 
@@ -70,7 +84,9 @@ public sealed class MapperConfiguration
         var compilationResult = _projectionCompiler.CompileProjection(
             typePair,
             typeMapConfig.PropertyMaps,
-            typeMapConfig.CustomConstructor);
+            typeMapConfig.CustomConstructor,
+            catalog,
+            compilationStack: null);
 
         // Compile in-memory delegate from the projection expression
         var compiledDelegate = _inMemoryCompiler.CompileDelegate(
@@ -86,7 +102,8 @@ public sealed class MapperConfiguration
             compiledDelegate,
             compilationResult.ClosureHolderType,
             compilationResult.DefaultClosureHolder,
-            compilationResult.HolderPropertyMap);
+            compilationResult.HolderPropertyMap,
+            typeMapConfig.MaxDepth);
 
         _typeMaps[typePair] = typeMap;
     }

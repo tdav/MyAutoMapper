@@ -51,7 +51,7 @@ public class CategoriesController : ControllerBase
             {
                 if (lookup.TryGetValue(parentId.Value, out var parent))
                 {
-                    parent.SubCategories.Add(cat);
+                    parent.Children.Add(cat);
                 }
             }
             else

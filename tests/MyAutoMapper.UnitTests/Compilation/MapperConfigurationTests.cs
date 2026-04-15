@@ -71,4 +71,35 @@ public class MapperConfigurationTests
         var typeMap = config.GetTypeMap<SimpleSource, SimpleDest>();
         typeMap.CompiledDelegate.Should().NotBeNull();
     }
+
+    private class ReverseProfile : MappingProfile
+    {
+        public ReverseProfile()
+        {
+            CreateMap<SimpleSource, SimpleDest>().ReverseMap();
+        }
+    }
+
+    private class ExplicitReverseProfile : MappingProfile
+    {
+        public ExplicitReverseProfile()
+        {
+            CreateMap<SimpleDest, SimpleSource>();
+        }
+    }
+
+    [Fact]
+    public void Build_DuplicateTypePairAcrossProfiles_LastWins_DoesNotThrow()
+    {
+        // Profile 1 registers (SimpleSource, SimpleDest) + reverse (SimpleDest, SimpleSource).
+        // Profile 2 registers (SimpleDest, SimpleSource) again — duplicate pair across profiles.
+        // Previously (pre-two-phase) the indexer assignment silently overwrote; the two-phase
+        // catalog must preserve that last-wins semantic rather than throwing on duplicates.
+        var builder = new MappingConfigurationBuilder();
+        builder.AddProfile<ReverseProfile>();
+        builder.AddProfile<ExplicitReverseProfile>();
+
+        var act = () => builder.Build();
+        act.Should().NotThrow();
+    }
 }
