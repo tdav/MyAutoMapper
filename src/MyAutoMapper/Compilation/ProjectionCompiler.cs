@@ -25,7 +25,6 @@ internal sealed class ProjectionCompiler
         LambdaExpression? customConstructor,
         IReadOnlyDictionary<TypePair, ITypeMapConfiguration> catalog,
         Stack<TypePair>? compilationStack = null,
-        int? maxDepth = null,
         ConstantExpression? sharedHolderConstant = null,
         HolderTypeInfo? sharedHolderInfo = null)
     {
@@ -48,6 +47,9 @@ internal sealed class ProjectionCompiler
                 .Where(pm => pm.HasParameterizedSource && pm.ParameterSlot is not null)
                 .ToList();
 
+            // TODO: holder-sharing not yet implemented — always creates fresh holder.
+            // sharedHolderConstant and sharedHolderInfo are aspirational wiring for future
+            // recursive calls to reuse the parent's closure holder instead of creating a new one.
             HolderTypeInfo? holderInfo = null;
             object? defaultHolder = null;
             ConstantExpression? holderConstant = null;
@@ -124,6 +126,13 @@ internal sealed class ProjectionCompiler
                     {
                         valueExpression = nested!;
                     }
+                    else if (CollectionProjectionBuilder.TryGetElementType(valueExpression.Type, out _)
+                          && CollectionProjectionBuilder.TryGetElementType(propertyMap.DestinationProperty.PropertyType, out _))
+                    {
+                        // Both sides are collections but no TypeMap for element pair — skip this binding.
+                        // Without this guard, Expression.Convert would throw an invalid cast at runtime.
+                        continue;
+                    }
                     else
                     {
                         valueExpression = Expression.Convert(valueExpression, propertyMap.DestinationProperty.PropertyType);
@@ -160,6 +169,13 @@ internal sealed class ProjectionCompiler
                             out var nestedConv))
                     {
                         conventionExpr = nestedConv!;
+                    }
+                    else if (CollectionProjectionBuilder.TryGetElementType(conventionExpr.Type, out _)
+                          && CollectionProjectionBuilder.TryGetElementType(destProp.PropertyType, out _))
+                    {
+                        // Both sides are collections but no TypeMap for element pair — skip this binding.
+                        // Without this guard, Expression.Convert would throw an invalid cast at runtime.
+                        continue;
                     }
                     else
                     {
@@ -231,7 +247,7 @@ internal sealed class ProjectionCompiler
 
         // Count how many times this pair already appears in the stack (recursion depth)
         var currentDepth = stack.Count(p => p == elemPair);
-        var elemMaxDepth = elemConfig.MaxDepth ?? (stack.Contains(elemPair) ? 3 : int.MaxValue);
+        var elemMaxDepth = elemConfig.MaxDepth ?? (currentDepth > 0 ? 3 : int.MaxValue);
 
         if (currentDepth >= elemMaxDepth)
         {
@@ -246,7 +262,6 @@ internal sealed class ProjectionCompiler
             elemConfig.CustomConstructor,
             catalog,
             stack,
-            elemConfig.MaxDepth,
             sharedHolderConstant,
             sharedHolderInfo);
 

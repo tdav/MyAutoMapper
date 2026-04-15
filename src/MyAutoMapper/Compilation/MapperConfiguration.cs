@@ -86,8 +86,7 @@ public sealed class MapperConfiguration
             typeMapConfig.PropertyMaps,
             typeMapConfig.CustomConstructor,
             catalog,
-            compilationStack: null,
-            maxDepth: typeMapConfig.MaxDepth);
+            compilationStack: null);
 
         // Compile in-memory delegate from the projection expression
         var compiledDelegate = _inMemoryCompiler.CompileDelegate(
