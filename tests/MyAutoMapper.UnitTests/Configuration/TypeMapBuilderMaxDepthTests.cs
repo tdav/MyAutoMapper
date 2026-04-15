@@ -1,7 +1,7 @@
 using FluentAssertions;
 using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.UnitTests;
+namespace MyAutoMapper.UnitTests.Configuration;
 
 public class TypeMapBuilderMaxDepthTests
 {
@@ -26,6 +26,15 @@ public class TypeMapBuilderMaxDepthTests
     {
         var p = new MappingProfileAnon(b => b.CreateMap<Src, Dst>());
         p.TypeMaps.Single().MaxDepth.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void MaxDepth_throws_when_depth_is_less_than_one(int depth)
+    {
+        var act = () => new MappingProfileAnon(b => b.CreateMap<Src, Dst>().MaxDepth(depth));
+        act.Should().Throw<ArgumentOutOfRangeException>().WithParameterName("depth");
     }
 
     private sealed class MappingProfileAnon : MappingProfile
