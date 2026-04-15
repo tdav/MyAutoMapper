@@ -10,4 +10,5 @@ public interface ITypeMapConfiguration
     LambdaExpression? CustomConstructor { get; }
     ITypeMapConfiguration? ReverseTypeMap { get; }
     IReadOnlyList<string> SkippedReverseProperties { get; }
+    int? MaxDepth { get; }
 }
