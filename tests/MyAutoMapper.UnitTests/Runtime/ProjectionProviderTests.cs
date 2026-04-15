@@ -26,7 +26,7 @@ public class ProjectionProviderTests
 
             CreateMap<LocalizedSource, LocalizedDest>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
-                .ForMember(d => d.LocalizedName, o => o.MapFrom(lang,
+                .ForMember(d => d.LocalizedName, o => o.MapFrom<string>(lang,
                     (s, l) => l == "en" ? s.NameEn :
                               l == "fr" ? s.NameFr :
                               s.NameDefault));
