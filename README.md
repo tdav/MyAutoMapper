@@ -31,6 +31,7 @@ var categories = await _db.Categories
 |---|---|
 | **Expression projections** | Generates `Expression<Func<TSource, TDest>>` for EF Core `IQueryable` — only mapped columns appear in SQL |
 | **Parameterized projections** | `ParameterSlot<T>` uses a closure pattern that EF Core translates to native SQL parameters (`@__param_0`), preserving the query plan cache |
+| **Nested collection projection** | `IEnumerable<TSrc> → IEnumerable<TDest>` projected automatically via `.Select(new TDest {...})`; self-referential hierarchies bounded by `MaxDepth(n)` |
 | **In-memory mapping** | Compiled `Func<TSource, TDest>` delegates for fast object-to-object mapping |
 | **Conventions** | Auto-maps by matching property names + flattens nested objects (`Address.City` -> `AddressCity`) |
 | **Fluent API** | `CreateMap<S, D>().ForMember(...).Ignore(...).ConstructUsing(...).ReverseMap()` |
@@ -115,7 +116,56 @@ Source.Address.City    → Dest.AddressCity
 Source.Address.ZipCode → Dest.AddressZipCode
 ```
 
+**Collections with the same name**:
+```
+Source.Children (List<Category>)   → Dest.Children (List<CategoryViewModel>)
+Source.Products (List<Product>)    → Dest.Products (List<ProductDto>)
+```
+If `CreateMap<Category, CategoryViewModel>()` exists, the compiler emits
+`src.Children.Select(c => new CategoryViewModel { ... }).ToList()` recursively —
+no extra `ForMember` needed.
+
 Explicit `ForMember` always overrides conventions.
+
+---
+
+## Nested Collection Projection
+
+Collection properties with mapped element types are projected recursively into a
+single EF Core query. No extra configuration, no manual `.Select(...)` in the
+controller.
+
+```csharp
+public class CategoryProfile : MappingProfile
+{
+    public CategoryProfile()
+    {
+        // Self-referential: CategoryViewModel has List<CategoryViewModel> Children.
+        // MaxDepth(n) bounds the generated tree — otherwise recursion would be infinite.
+        CreateMap<Category, CategoryViewModel>().MaxDepth(5);
+    }
+}
+
+// Controller — one query, full tree:
+var tree = _db.Categories
+    .Where(c => c.ParentId == null)
+    .ProjectTo<CategoryViewModel>()
+    .ToList();
+```
+
+The generated SQL traverses the hierarchy via `LEFT JOIN LATERAL` (or multiple
+subqueries, depending on the EF Core provider) — there is no N+1.
+
+**Rules:**
+
+- Collection types supported: `IEnumerable<T>`, `ICollection<T>`, `IList<T>`,
+  `IReadOnlyCollection<T>`, `IReadOnlyList<T>`, arrays (`T[]`) and concrete `List<T>`.
+- Mapping between element types must be registered with `CreateMap<TSrc, TDest>()`.
+- For self-references, `MaxDepth(n)` is mandatory — without it configuration
+  validation throws. `n` is the maximum number of times the same map may appear
+  on a single recursive branch.
+- For non-recursive nested collections (e.g. `Category.Products`), `MaxDepth` is
+  optional.
 
 ---
 
@@ -236,6 +286,39 @@ SELECT CASE WHEN @__lang_0 = 'ru' THEN "p"."NameRu" ELSE "p"."NameUz" END AS "Lo
        "p"."Id", "p"."Price"
 FROM "Products" AS "p"
 ```
+
+### Category Tree (nested projection)
+
+```csharp
+public class CategoryViewModelProfile : MappingProfile
+{
+    public CategoryViewModelProfile()
+    {
+        var lang = DeclareParameter<string>("lang");
+
+        CreateMap<Category, CategoryViewModel>()
+            .MaxDepth(5)
+            .ForMember(d => d.LocalizedName, o => o.MapFrom(lang,
+                (src, l) => l == "uz" ? src.NameUz
+                          : l == "lt" ? src.NameLt
+                          : src.NameRu));
+        // Children is projected automatically via convention (same name as Category.Children).
+    }
+}
+
+// Controller:
+var tree = _db.Categories
+    .Where(c => c.ParentId == null)
+    .ProjectTo<CategoryViewModel>(p => p.Set("lang", lang))
+    .ToList();
+```
+
+`GET /api/categories/tree?lang=ru` returns the full hierarchy up to depth 5 as
+a single SQL query.
+
+> **Note:** parameter holders are not shared across recursive levels yet — the
+> `lang` value currently applies to the root level only; nested children fall
+> back to `NameRu`. Tracked as a TODO in `ProjectionCompiler`.
 
 ### Running the Example
 

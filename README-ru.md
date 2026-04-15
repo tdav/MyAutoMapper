@@ -31,6 +31,7 @@ var categories = await _db.Categories
 |---|---|
 | **Expression-проекции** | Генерирует `Expression<Func<TSource, TDest>>` для EF Core `IQueryable` — в SQL попадают только нужные столбцы |
 | **Параметризованные проекции** | `ParameterSlot<T>` использует closure-паттерн, который EF Core транслирует в SQL-параметры (`@__param_0`), сохраняя кэш планов запросов |
+| **Проекция вложенных коллекций** | `IEnumerable<TSrc> → IEnumerable<TDest>` проецируется автоматически через `.Select(new TDest {...})`; самоссылочные иерархии ограничиваются `MaxDepth(n)` |
 | **In-memory маппинг** | Скомпилированные `Func<TSource, TDest>` делегаты для быстрого маппинга объект-в-объект |
 | **Конвенции** | Автоматический маппинг по совпадению имён + flattening вложенных объектов (`Address.City` -> `AddressCity`) |
 | **Fluent API** | `CreateMap<S, D>().ForMember(...).Ignore(...).ConstructUsing(...).ReverseMap()` |
@@ -115,7 +116,58 @@ Source.Address.City    → Dest.AddressCity
 Source.Address.ZipCode → Dest.AddressZipCode
 ```
 
+**Коллекции с одинаковыми именами**:
+```
+Source.Children (List<Category>)   → Dest.Children (List<CategoryViewModel>)
+Source.Products (List<Product>)    → Dest.Products (List<ProductDto>)
+```
+Если для типов элементов зарегистрирован `CreateMap<Category, CategoryViewModel>()`,
+компилятор эмитит `src.Children.Select(c => new CategoryViewModel { ... }).ToList()`
+рекурсивно — дополнительный `ForMember` не нужен.
+
 Явный `ForMember` всегда перекрывает конвенции.
+
+---
+
+## Проекция вложенных коллекций
+
+Коллекционные свойства с зарегистрированным маппингом элементов проецируются
+рекурсивно одним EF Core запросом. Без дополнительной конфигурации и без ручных
+`.Select(...)` в контроллере.
+
+```csharp
+public class CategoryProfile : MappingProfile
+{
+    public CategoryProfile()
+    {
+        // Самоссылка: CategoryViewModel содержит List<CategoryViewModel> Children.
+        // MaxDepth(n) ограничивает глубину генерируемого дерева —
+        // иначе рекурсия была бы бесконечной.
+        CreateMap<Category, CategoryViewModel>().MaxDepth(5);
+    }
+}
+
+// Контроллер — один запрос, всё дерево:
+var tree = _db.Categories
+    .Where(c => c.ParentId == null)
+    .ProjectTo<CategoryViewModel>()
+    .ToList();
+```
+
+Генерируемый SQL обходит иерархию через `LEFT JOIN LATERAL` (или несколько
+подзапросов — зависит от EF Core провайдера). Никакого N+1.
+
+**Правила:**
+
+- Поддерживаемые типы коллекций: `IEnumerable<T>`, `ICollection<T>`, `IList<T>`,
+  `IReadOnlyCollection<T>`, `IReadOnlyList<T>`, массивы (`T[]`) и `List<T>`.
+- Маппинг между типами элементов должен быть зарегистрирован через
+  `CreateMap<TSrc, TDest>()`.
+- Для самоссылочных маппингов `MaxDepth(n)` обязателен — без него валидация
+  конфигурации бросит исключение. `n` — максимальное число повторов одной и той
+  же пары типов на одной рекурсивной ветке.
+- Для не-рекурсивных вложенных коллекций (например `Category.Products`)
+  `MaxDepth` опционален.
 
 ---
 
@@ -236,6 +288,39 @@ SELECT CASE WHEN @__lang_0 = 'ru' THEN "p"."NameRu" ELSE "p"."NameUz" END AS "Lo
        "p"."Id", "p"."Price"
 FROM "Products" AS "p"
 ```
+
+### Дерево категорий (вложенная проекция)
+
+```csharp
+public class CategoryViewModelProfile : MappingProfile
+{
+    public CategoryViewModelProfile()
+    {
+        var lang = DeclareParameter<string>("lang");
+
+        CreateMap<Category, CategoryViewModel>()
+            .MaxDepth(5)
+            .ForMember(d => d.LocalizedName, o => o.MapFrom(lang,
+                (src, l) => l == "uz" ? src.NameUz
+                          : l == "lt" ? src.NameLt
+                          : src.NameRu));
+        // Children проецируется автоматически по конвенции (совпадение имени с Category.Children).
+    }
+}
+
+// Контроллер:
+var tree = _db.Categories
+    .Where(c => c.ParentId == null)
+    .ProjectTo<CategoryViewModel>(p => p.Set("lang", lang))
+    .ToList();
+```
+
+`GET /api/categories/tree?lang=ru` возвращает всю иерархию до глубины 5 одним
+SQL-запросом.
+
+> **Замечание:** holder-ы параметров пока не шарятся между уровнями рекурсии —
+> значение `lang` применяется только к корневому уровню, вложенные children
+> откатываются на `NameRu`. Ограничение зафиксировано TODO в `ProjectionCompiler`.
 
 ### Запуск примера
 

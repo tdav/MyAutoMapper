@@ -16,6 +16,6 @@ public class CategoryViewModelProfile : MappingProfile
                 (src, l) => l == "uz" ? src.NameUz
                           : l == "lt" ? src.NameLt
                           : src.NameRu));
-        // Children property is projected automatically via convention matching (same name as Category.Children)
+        // Children is projected automatically via convention (same name as Category.Children).
     }
 }
