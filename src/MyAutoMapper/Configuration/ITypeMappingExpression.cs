@@ -15,4 +15,6 @@ public interface ITypeMappingExpression<TSource, TDest>
         Expression<Func<TSource, TDest>> constructor);
 
     ITypeMappingExpression<TDest, TSource> ReverseMap();
+
+    ITypeMappingExpression<TSource, TDest> MaxDepth(int depth);
 }

@@ -18,7 +18,7 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
     public LambdaExpression? CustomConstructor => _customConstructor;
     public ITypeMapConfiguration? ReverseTypeMap => _reverseMap;
     public IReadOnlyList<string> SkippedReverseProperties => _skippedReverseProperties;
-    public int? MaxDepth => _maxDepth;
+    int? ITypeMapConfiguration.MaxDepth => _maxDepth;
 
     public ITypeMappingExpression<TSource, TDest> ForMember<TMember>(
         Expression<Func<TDest, TMember>> destinationMember,
@@ -52,6 +52,14 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
         Expression<Func<TSource, TDest>> constructor)
     {
         _customConstructor = constructor;
+        return this;
+    }
+
+    public ITypeMappingExpression<TSource, TDest> MaxDepth(int depth)
+    {
+        if (depth < 1)
+            throw new ArgumentOutOfRangeException(nameof(depth), "MaxDepth must be >= 1");
+        _maxDepth = depth;
         return this;
     }
 
