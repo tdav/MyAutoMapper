@@ -13,13 +13,12 @@ public sealed class TypeMap
     public Delegate? CompiledDelegate { get; }
     public LambdaExpression? CustomConstructor { get; }
     public IReadOnlyList<IParameterSlot> DeclaredParameters { get; }
+    public int? MaxDepth { get; }
 
     // Stores the closure holder type info for parameterized projections (immutable after construction)
     public Type? ClosureHolderType { get; }
     public object? DefaultClosureHolder { get; }
     internal IReadOnlyDictionary<string, PropertyInfo>? HolderPropertyMap { get; }
-
-    public int? MaxDepth { get; }
 
     internal TypeMap(
         TypePair typePair,
