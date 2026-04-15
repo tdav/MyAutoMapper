@@ -66,7 +66,12 @@ internal sealed class ConfigurationValidator
                 var sourceReturnType = sourceLambda.ReturnType;
                 var destPropertyType = propertyMap.DestinationProperty.PropertyType;
 
-                if (!IsAssignableOrConvertible(sourceReturnType, destPropertyType))
+                // Allow collection-to-collection mappings (e.g. List<Category> -> List<CategoryViewModel>).
+                // The ProjectionCompiler validates element-level TypeMap presence at compile time.
+                var bothCollections = CollectionProjectionBuilder.TryGetElementType(sourceReturnType, out _)
+                                   && CollectionProjectionBuilder.TryGetElementType(destPropertyType, out _);
+
+                if (!bothCollections && !IsAssignableOrConvertible(sourceReturnType, destPropertyType))
                 {
                     errors.Add(
                         $"[{mappingName}] Property '{propertyMap.DestinationProperty.Name}': " +
