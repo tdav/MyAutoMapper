@@ -126,11 +126,12 @@ internal sealed class ProjectionCompiler
                     {
                         valueExpression = nested!;
                     }
-                    else if (CollectionProjectionBuilder.TryGetElementType(valueExpression.Type, out _)
-                          && CollectionProjectionBuilder.TryGetElementType(propertyMap.DestinationProperty.PropertyType, out _))
+                    else if (CollectionProjectionBuilder.TryGetElementType(valueExpression.Type, out var skipSrcElem)
+                          && CollectionProjectionBuilder.TryGetElementType(propertyMap.DestinationProperty.PropertyType, out var skipDstElem)
+                          && !skipDstElem.IsAssignableFrom(skipSrcElem))
                     {
-                        // Both sides are collections but no TypeMap for element pair — skip this binding.
-                        // Without this guard, Expression.Convert would throw an invalid cast at runtime.
+                        // Both sides are collections with incompatible element types and no TypeMap — skip binding.
+                        // (If element types are compatible, fall through to Expression.Convert below.)
                         continue;
                     }
                     else
@@ -170,11 +171,12 @@ internal sealed class ProjectionCompiler
                     {
                         conventionExpr = nestedConv!;
                     }
-                    else if (CollectionProjectionBuilder.TryGetElementType(conventionExpr.Type, out _)
-                          && CollectionProjectionBuilder.TryGetElementType(destProp.PropertyType, out _))
+                    else if (CollectionProjectionBuilder.TryGetElementType(conventionExpr.Type, out var skipSrcElem)
+                          && CollectionProjectionBuilder.TryGetElementType(destProp.PropertyType, out var skipDstElem)
+                          && !skipDstElem.IsAssignableFrom(skipSrcElem))
                     {
-                        // Both sides are collections but no TypeMap for element pair — skip this binding.
-                        // Without this guard, Expression.Convert would throw an invalid cast at runtime.
+                        // Both sides are collections with incompatible element types and no TypeMap — skip binding.
+                        // (If element types are compatible, fall through to Expression.Convert below.)
                         continue;
                     }
                     else
