@@ -85,4 +85,20 @@ public class CollectionProjectionBuilderTests
         var lambda = Expression.Lambda<Func<int[], ICollection<int>>>(expr, srcParam).Compile();
         lambda(new[] { 3, 4 }).Should().Equal(4, 5);
     }
+
+    [Fact]
+    public void BuildSelect_uses_ToList_for_IReadOnlyCollection_dest()
+    {
+        var srcParam = Expression.Parameter(typeof(int[]), "arr");
+        var elemParam = Expression.Parameter(typeof(int), "x");
+        var elemLambda = Expression.Lambda(Expression.Add(elemParam, Expression.Constant(1)), elemParam);
+
+        var expr = CollectionProjectionBuilder.BuildSelect(srcParam, elemLambda, typeof(IReadOnlyCollection<int>));
+
+        // Compile and verify the runtime type is List<int>
+        var lambda = Expression.Lambda<Func<int[], IReadOnlyCollection<int>>>(expr, srcParam).Compile();
+        var result = lambda(new[] { 1, 2 });
+        result.Should().BeOfType<List<int>>();
+        result.Should().Equal(2, 3);
+    }
 }

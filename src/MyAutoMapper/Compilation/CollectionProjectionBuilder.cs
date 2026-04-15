@@ -33,7 +33,7 @@ internal static class CollectionProjectionBuilder
         if (destType.IsGenericType)
         {
             var def = destType.GetGenericTypeDefinition();
-            if (def == typeof(IEnumerable<>) || def == typeof(IReadOnlyCollection<>))
+            if (def == typeof(IEnumerable<>))
                 return call;
         }
 
