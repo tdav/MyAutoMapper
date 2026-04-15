@@ -231,7 +231,7 @@ internal sealed class ProjectionCompiler
 
         // Count how many times this pair already appears in the stack (recursion depth)
         var currentDepth = stack.Count(p => p == elemPair);
-        var elemMaxDepth = elemConfig.MaxDepth ?? int.MaxValue;
+        var elemMaxDepth = elemConfig.MaxDepth ?? (stack.Contains(elemPair) ? 3 : int.MaxValue);
 
         if (currentDepth >= elemMaxDepth)
         {
