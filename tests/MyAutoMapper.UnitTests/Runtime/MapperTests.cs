@@ -52,3 +52,49 @@ public class MapperTests
         act.Should().Throw<InvalidOperationException>();
     }
 }
+
+public class MapperExplicitCollectionMapFromTests
+{
+    private sealed class Src
+    {
+        public int Id { get; set; }
+        public List<Src> Children { get; set; } = new();
+    }
+
+    private sealed class Dst
+    {
+        public int Id { get; set; }
+        public List<Dst> Children { get; set; } = new();
+    }
+
+    private sealed class Profile : MappingProfile
+    {
+        public Profile()
+        {
+            CreateMap<Src, Dst>()
+                .MaxDepth(2)
+                .ForMember(d => d.Children, o => o.MapFrom(s => s.Children));
+        }
+    }
+
+    [Fact]
+    public void Map_runs_through_explicit_collection_MapFrom()
+    {
+        var builder = new MappingConfigurationBuilder();
+        builder.AddProfile(new Profile());
+        var cfg = builder.Build();
+        var mapper = cfg.CreateMapper();
+
+        var src = new Src
+        {
+            Id = 1,
+            Children = { new Src { Id = 2, Children = { new Src { Id = 3 } } } }
+        };
+
+        var dst = mapper.Map<Src, Dst>(src);
+
+        dst.Id.Should().Be(1);
+        dst.Children.Should().HaveCount(1);
+        dst.Children[0].Id.Should().Be(2);
+    }
+}
