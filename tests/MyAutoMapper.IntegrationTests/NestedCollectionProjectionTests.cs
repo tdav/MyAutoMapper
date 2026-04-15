@@ -94,6 +94,28 @@ public class NestedCollectionProjectionTests : IDisposable
         _proj = cfg.CreateProjectionProvider();
     }
 
+    [Fact(Skip = "holder-sharing not yet implemented — nested levels create fresh holder (see ProjectionCompiler TODO)")]
+    public void Parameter_lang_propagates_to_all_nesting_levels()
+    {
+        // TODO: This test documents the EXPECTED behavior once holder-sharing is implemented
+        // in ProjectionCompiler. Currently, when a root projection holder receives a parameter
+        // (e.g. lang = "ru"), child/nested projections always receive a fresh holder and do NOT
+        // inherit the parameter value — so localized names at nested levels would be wrong.
+
+        // EXPECTED setup (to be implemented when holder-sharing lands):
+        //   1. Define LocalizedCategory entity with NameRu / NameUz properties (and Children).
+        //   2. Define LocalizedCategoryVm with LocalizedName / Children.
+        //   3. Define a Profile with ParameterSlot<string>("lang") and a resolver that picks
+        //      NameRu vs NameUz based on the slot value.
+        //   4. Build a 2-level tree (root → child) in the in-memory DB.
+        //   5. ProjectTo<LocalizedCategory, LocalizedCategoryVm>(_proj, p => p.Set("lang", "ru"))
+        //   6. Assert vm.LocalizedName == root.NameRu  (root level picks "ru")
+        //   7. Assert vm.Children[0].LocalizedName == child.NameRu  (child level ALSO picks "ru")
+        //      — this assertion is what will fail until holder-sharing is implemented.
+
+        throw new NotImplementedException("Implement after holder-sharing is added to ProjectionCompiler.");
+    }
+
     [Fact]
     public void Projects_up_to_MaxDepth_levels()
     {
