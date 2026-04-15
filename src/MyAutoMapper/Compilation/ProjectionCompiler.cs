@@ -73,6 +73,7 @@ internal sealed class ProjectionCompiler
                     continue;
 
                 Expression valueExpression;
+                bool isExplicit = false;
 
                 if (propertyMap.HasParameterizedSource
                     && propertyMap.ParameterizedSourceExpression is LambdaExpression paramLambda
@@ -90,10 +91,12 @@ internal sealed class ProjectionCompiler
                     var body = ParameterReplacer.Replace(paramLambda.Body, srcLambdaParam, sourceParam);
                     body = ParameterReplacer.Replace(body, paramLambdaParam, holderPropertyAccess);
 
+                    isExplicit = true;
                     valueExpression = body;
                 }
                 else if (propertyMap.SourceExpression is LambdaExpression sourceLambda)
                 {
+                    isExplicit = true;
                     valueExpression = ParameterReplacer.Replace(
                         sourceLambda.Body,
                         sourceLambda.Parameters[0],
@@ -126,10 +129,17 @@ internal sealed class ProjectionCompiler
                     {
                         valueExpression = nested!;
                     }
-                    else if (CollectionProjectionBuilder.TryGetElementType(valueExpression.Type, out _)
-                          && CollectionProjectionBuilder.TryGetElementType(propertyMap.DestinationProperty.PropertyType, out _)
+                    else if (CollectionProjectionBuilder.TryGetElementType(valueExpression.Type, out var srcElement)
+                          && CollectionProjectionBuilder.TryGetElementType(propertyMap.DestinationProperty.PropertyType, out var dstElement)
                           && !propertyMap.DestinationProperty.PropertyType.IsAssignableFrom(valueExpression.Type))
                     {
+                        if (isExplicit)
+                        {
+                            throw new InvalidOperationException(
+                                $"Cannot map member '{propertyMap.DestinationProperty.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name}': " +
+                                $"no TypeMap registered to project elements '{srcElement.FullName}' -> '{dstElement.FullName}'. " +
+                                $"Register the map via CreateMap<{srcElement.Name}, {dstElement.Name}>() or remove the explicit ForMember.");
+                        }
                         // Both are collections with incompatible container types and no element TypeMap — skip binding.
                         // (If containers are compatible, fall through to Expression.Convert below.)
                         continue;
