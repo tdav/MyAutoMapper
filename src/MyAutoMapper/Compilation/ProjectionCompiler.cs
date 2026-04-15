@@ -22,8 +22,17 @@ internal sealed class ProjectionCompiler
     public CompilationResult CompileProjection(
         TypePair typePair,
         IReadOnlyList<PropertyMap> propertyMaps,
-        LambdaExpression? customConstructor)
+        LambdaExpression? customConstructor,
+        IReadOnlyDictionary<TypePair, ITypeMapConfiguration> catalog,
+        Stack<TypePair>? compilationStack = null,
+        int? maxDepth = null,
+        ConstantExpression? sharedHolderConstant = null,
+        HolderTypeInfo? sharedHolderInfo = null)
     {
+        compilationStack ??= new Stack<TypePair>();
+        compilationStack.Push(typePair);
+        try
+        {
         var sourceType = typePair.SourceType;
         var destType = typePair.DestinationType;
         var sourceParam = Expression.Parameter(sourceType, "src");
@@ -165,5 +174,10 @@ internal sealed class ProjectionCompiler
             holderInfo?.HolderType,
             defaultHolder,
             holderInfo?.PropertyMap);
+        }
+        finally
+        {
+            compilationStack.Pop();
+        }
     }
 }
