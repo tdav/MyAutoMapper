@@ -86,7 +86,8 @@ public sealed class MapperConfiguration
             compiledDelegate,
             compilationResult.ClosureHolderType,
             compilationResult.DefaultClosureHolder,
-            compilationResult.HolderPropertyMap);
+            compilationResult.HolderPropertyMap,
+            typeMapConfig.MaxDepth);
 
         _typeMaps[typePair] = typeMap;
     }

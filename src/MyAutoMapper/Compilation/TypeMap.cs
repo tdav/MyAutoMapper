@@ -19,6 +19,8 @@ public sealed class TypeMap
     public object? DefaultClosureHolder { get; }
     internal IReadOnlyDictionary<string, PropertyInfo>? HolderPropertyMap { get; }
 
+    public int? MaxDepth { get; }
+
     internal TypeMap(
         TypePair typePair,
         IReadOnlyList<PropertyMap> propertyMaps,
@@ -28,7 +30,8 @@ public sealed class TypeMap
         Delegate? compiledDelegate,
         Type? closureHolderType,
         object? defaultClosureHolder,
-        IReadOnlyDictionary<string, PropertyInfo>? holderPropertyMap)
+        IReadOnlyDictionary<string, PropertyInfo>? holderPropertyMap,
+        int? maxDepth)
     {
         TypePair = typePair;
         PropertyMaps = propertyMaps;
@@ -39,6 +42,7 @@ public sealed class TypeMap
         ClosureHolderType = closureHolderType;
         DefaultClosureHolder = defaultClosureHolder;
         HolderPropertyMap = holderPropertyMap;
+        MaxDepth = maxDepth;
     }
 }
 
