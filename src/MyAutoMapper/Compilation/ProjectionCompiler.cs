@@ -126,12 +126,12 @@ internal sealed class ProjectionCompiler
                     {
                         valueExpression = nested!;
                     }
-                    else if (CollectionProjectionBuilder.TryGetElementType(valueExpression.Type, out var skipSrcElem)
-                          && CollectionProjectionBuilder.TryGetElementType(propertyMap.DestinationProperty.PropertyType, out var skipDstElem)
-                          && !skipDstElem.IsAssignableFrom(skipSrcElem))
+                    else if (CollectionProjectionBuilder.TryGetElementType(valueExpression.Type, out _)
+                          && CollectionProjectionBuilder.TryGetElementType(propertyMap.DestinationProperty.PropertyType, out _)
+                          && !propertyMap.DestinationProperty.PropertyType.IsAssignableFrom(valueExpression.Type))
                     {
-                        // Both sides are collections with incompatible element types and no TypeMap — skip binding.
-                        // (If element types are compatible, fall through to Expression.Convert below.)
+                        // Both are collections with incompatible container types and no element TypeMap — skip binding.
+                        // (If containers are compatible, fall through to Expression.Convert below.)
                         continue;
                     }
                     else
@@ -171,12 +171,12 @@ internal sealed class ProjectionCompiler
                     {
                         conventionExpr = nestedConv!;
                     }
-                    else if (CollectionProjectionBuilder.TryGetElementType(conventionExpr.Type, out var skipSrcElem)
-                          && CollectionProjectionBuilder.TryGetElementType(destProp.PropertyType, out var skipDstElem)
-                          && !skipDstElem.IsAssignableFrom(skipSrcElem))
+                    else if (CollectionProjectionBuilder.TryGetElementType(conventionExpr.Type, out _)
+                          && CollectionProjectionBuilder.TryGetElementType(destProp.PropertyType, out _)
+                          && !destProp.PropertyType.IsAssignableFrom(conventionExpr.Type))
                     {
-                        // Both sides are collections with incompatible element types and no TypeMap — skip binding.
-                        // (If element types are compatible, fall through to Expression.Convert below.)
+                        // Both are collections with incompatible container types and no element TypeMap — skip binding.
+                        // (If containers are compatible, fall through to Expression.Convert below.)
                         continue;
                     }
                     else
