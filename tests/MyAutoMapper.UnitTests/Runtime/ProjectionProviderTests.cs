@@ -2,6 +2,8 @@ using FluentAssertions;
 using SmAutoMapper.Parameters;
 using SmAutoMapper.Runtime;
 using SmAutoMapper.Configuration;
+using SmAutoMapper.Compilation;
+using SmAutoMapper.Extensions;
 
 namespace MyAutoMapper.UnitTests.Runtime;
 
@@ -93,5 +95,104 @@ public class ProjectionProviderTests
         var source = new LocalizedSource { Id = 1, NameEn = "Hello", NameFr = "Bonjour", NameDefault = "Default" };
         funcEn(source).LocalizedName.Should().Be("Hello");
         funcFr(source).LocalizedName.Should().Be("Bonjour");
+    }
+}
+
+public class ExplicitCollectionMapFromProjectionTests
+{
+    private sealed class Node
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public List<Node> Children { get; set; } = new();
+    }
+
+    private sealed class NodeVm
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public List<NodeVm> Children { get; set; } = new();
+    }
+
+    private sealed class Profile : MappingProfile
+    {
+        public Profile()
+        {
+            CreateMap<Node, NodeVm>()
+                .MaxDepth(3)
+                .ForMember(d => d.Children, o => o.MapFrom(s => s.Children));
+        }
+    }
+
+    [Fact]
+    public void Explicit_collection_MapFrom_projects_children()
+    {
+        var cfg = new MapperConfiguration(new[] { new Profile() });
+        var provider = cfg.CreateProjectionProvider();
+
+        var data = new[]
+        {
+            new Node
+            {
+                Id = 1, Name = "root",
+                Children =
+                {
+                    new Node { Id = 2, Name = "child" }
+                }
+            }
+        }.AsQueryable();
+
+        var projected = data.ProjectTo<Node, NodeVm>(provider).Single();
+
+        projected.Id.Should().Be(1);
+        projected.Children.Should().HaveCount(1);
+        projected.Children[0].Id.Should().Be(2);
+    }
+}
+
+public class ExplicitCollectionMapFromFailFastTests
+{
+    private sealed class Src { public List<Inner> Items { get; set; } = new(); }
+    private sealed class Dst { public List<InnerVm> Items { get; set; } = new(); }
+    private sealed class Inner { public int X { get; set; } }
+    private sealed class InnerVm { public int X { get; set; } }
+
+    private sealed class MissingElementMapProfile : MappingProfile
+    {
+        public MissingElementMapProfile()
+        {
+            // NOTE: no CreateMap<Inner, InnerVm>() — intentional.
+            CreateMap<Src, Dst>()
+                .ForMember(d => d.Items, o => o.MapFrom(s => s.Items));
+        }
+    }
+
+    [Fact]
+    public void Explicit_without_element_TypeMap_throws_with_clear_message()
+    {
+        Action act = () => new MapperConfiguration(new[] { new MissingElementMapProfile() });
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*Items*Inner*InnerVm*");
+    }
+}
+
+public class ConventionCollectionWithoutElementMapIsSilentTests
+{
+    private sealed class Src { public List<Inner> Items { get; set; } = new(); }
+    private sealed class Dst { public List<InnerVm> Items { get; set; } = new(); }
+    private sealed class Inner { public int X { get; set; } }
+    private sealed class InnerVm { public int X { get; set; } }
+
+    private sealed class ConventionOnlyProfile : MappingProfile
+    {
+        public ConventionOnlyProfile() => CreateMap<Src, Dst>();
+    }
+
+    [Fact]
+    public void Convention_without_element_TypeMap_does_not_throw()
+    {
+        Action act = () => new MapperConfiguration(new[] { new ConventionOnlyProfile() });
+        act.Should().NotThrow();
     }
 }
