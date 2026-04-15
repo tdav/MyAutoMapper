@@ -10,6 +10,7 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
     private readonly List<string> _skippedReverseProperties = [];
     private LambdaExpression? _customConstructor;
     private TypeMapBuilder<TDest, TSource>? _reverseMap;
+    private int? _maxDepth = null;
 
     public Type SourceType => typeof(TSource);
     public Type DestinationType => typeof(TDest);
@@ -17,7 +18,6 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
     public LambdaExpression? CustomConstructor => _customConstructor;
     public ITypeMapConfiguration? ReverseTypeMap => _reverseMap;
     public IReadOnlyList<string> SkippedReverseProperties => _skippedReverseProperties;
-    private int? _maxDepth = null;
     public int? MaxDepth => _maxDepth;
 
     public ITypeMappingExpression<TSource, TDest> ForMember<TMember>(
