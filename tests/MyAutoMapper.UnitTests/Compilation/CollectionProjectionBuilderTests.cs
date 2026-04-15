@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using FluentAssertions;
 using SmAutoMapper.Compilation;
 
@@ -31,5 +32,57 @@ public class CollectionProjectionBuilderTests
     {
         var ok = CollectionProjectionBuilder.TryGetElementType(input, out _);
         ok.Should().BeFalse();
+    }
+
+    [Fact]
+    public void BuildSelect_wraps_in_Select_and_ToList_when_dest_is_List()
+    {
+        var srcParam = Expression.Parameter(typeof(int[]), "arr");
+        var elemParam = Expression.Parameter(typeof(int), "x");
+        var elemLambda = Expression.Lambda(Expression.Add(elemParam, Expression.Constant(1)), elemParam);
+
+        var expr = CollectionProjectionBuilder.BuildSelect(
+            sourceCollection: srcParam,
+            elementProjection: elemLambda,
+            destType: typeof(List<int>));
+
+        var lambda = Expression.Lambda<Func<int[], List<int>>>(expr, srcParam).Compile();
+        lambda(new[] { 1, 2, 3 }).Should().Equal(2, 3, 4);
+    }
+
+    [Fact]
+    public void BuildSelect_returns_array_when_dest_is_array()
+    {
+        var srcParam = Expression.Parameter(typeof(int[]), "arr");
+        var elemParam = Expression.Parameter(typeof(int), "x");
+        var elemLambda = Expression.Lambda(Expression.Add(elemParam, Expression.Constant(1)), elemParam);
+
+        var expr = CollectionProjectionBuilder.BuildSelect(srcParam, elemLambda, typeof(int[]));
+        var lambda = Expression.Lambda<Func<int[], int[]>>(expr, srcParam).Compile();
+        lambda(new[] { 10 }).Should().Equal(11);
+    }
+
+    [Fact]
+    public void BuildSelect_returns_IEnumerable_unwrapped_when_dest_is_IEnumerable()
+    {
+        var srcParam = Expression.Parameter(typeof(int[]), "arr");
+        var elemParam = Expression.Parameter(typeof(int), "x");
+        var elemLambda = Expression.Lambda(Expression.Add(elemParam, Expression.Constant(1)), elemParam);
+
+        var expr = CollectionProjectionBuilder.BuildSelect(srcParam, elemLambda, typeof(IEnumerable<int>));
+        var lambda = Expression.Lambda<Func<int[], IEnumerable<int>>>(expr, srcParam).Compile();
+        lambda(new[] { 5, 6 }).Should().Equal(6, 7);
+    }
+
+    [Fact]
+    public void BuildSelect_uses_ToList_for_ICollection_dest()
+    {
+        var srcParam = Expression.Parameter(typeof(int[]), "arr");
+        var elemParam = Expression.Parameter(typeof(int), "x");
+        var elemLambda = Expression.Lambda(Expression.Add(elemParam, Expression.Constant(1)), elemParam);
+
+        var expr = CollectionProjectionBuilder.BuildSelect(srcParam, elemLambda, typeof(ICollection<int>));
+        var lambda = Expression.Lambda<Func<int[], ICollection<int>>>(expr, srcParam).Compile();
+        lambda(new[] { 3, 4 }).Should().Equal(4, 5);
     }
 }
