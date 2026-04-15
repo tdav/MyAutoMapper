@@ -12,10 +12,10 @@ public class CategoryViewModelProfile : MappingProfile
 
         CreateMap<Category, CategoryViewModel>()
             .MaxDepth(5)
-            .ForMember(d => d.LocalizedName, o => o.MapFrom(lang,
+            .ForMember(d => d.LocalizedName, o => o.MapFrom<string>(lang,
                 (src, l) => l == "uz" ? src.NameUz
                           : l == "lt" ? src.NameLt
-                          : src.NameRu));
-        // Children is projected automatically via convention (same name as Category.Children).
+                          : src.NameRu))
+            .ForMember(d => d.Children, o => o.MapFrom(src => src.Children));
     }
 }

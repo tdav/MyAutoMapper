@@ -16,11 +16,11 @@ public class ProductMappingProfile : MappingProfile
         var lang = DeclareParameter<string>("lang");
 
         CreateMap<Product, ProductViewModel>()
-            .ForMember(d => d.LocalizedName, o => o.MapFrom(lang,
+            .ForMember(d => d.LocalizedName, o => o.MapFrom<string>(lang,
                 (src, l) => l == "uz" ? src.NameUz
                           : l == "lt" ? src.NameLt
                           : src.NameRu))
-            .ForMember(d => d.LocalizedDescription, o => o.MapFrom(lang,
+            .ForMember(d => d.LocalizedDescription, o => o.MapFrom<string>(lang,
                 (src, l) => l == "uz" ? src.DescriptionUz
                           : l == "lt" ? src.DescriptionLt
                           : src.DescriptionRu));
