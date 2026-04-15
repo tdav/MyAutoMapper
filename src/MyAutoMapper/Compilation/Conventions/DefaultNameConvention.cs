@@ -3,6 +3,8 @@ using System.Reflection;
 
 namespace SmAutoMapper.Compilation.Conventions;
 
+// CollectionProjectionBuilder lives in SmAutoMapper.Compilation — the parent namespace.
+
 internal sealed class DefaultNameConvention : INameConvention
 {
     public bool TryGetSourceExpression(
@@ -33,6 +35,12 @@ internal sealed class DefaultNameConvention : INameConvention
         // Handle nullable wrapping: int -> int?
         var underlyingDest = Nullable.GetUnderlyingType(destType);
         if (underlyingDest is not null && underlyingDest.IsAssignableFrom(sourceType))
+            return true;
+
+        // Both are collections with different element types — the compiler's
+        // collection detector (TryBuildNestedCollection) will handle the projection.
+        if (CollectionProjectionBuilder.TryGetElementType(sourceType, out _)
+            && CollectionProjectionBuilder.TryGetElementType(destType, out _))
             return true;
 
         return false;

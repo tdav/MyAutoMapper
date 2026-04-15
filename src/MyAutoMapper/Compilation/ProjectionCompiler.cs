@@ -113,7 +113,21 @@ internal sealed class ProjectionCompiler
 
                 if (valueExpression.Type != propertyMap.DestinationProperty.PropertyType)
                 {
-                    valueExpression = Expression.Convert(valueExpression, propertyMap.DestinationProperty.PropertyType);
+                    if (TryBuildNestedCollection(
+                            valueExpression,
+                            propertyMap.DestinationProperty.PropertyType,
+                            catalog,
+                            compilationStack,
+                            sharedHolderConstant: holderConstant,
+                            sharedHolderInfo: holderInfo,
+                            out var nested))
+                    {
+                        valueExpression = nested!;
+                    }
+                    else
+                    {
+                        valueExpression = Expression.Convert(valueExpression, propertyMap.DestinationProperty.PropertyType);
+                    }
                 }
 
                 bindings.Add(Expression.Bind(propertyMap.DestinationProperty, valueExpression));
@@ -136,7 +150,21 @@ internal sealed class ProjectionCompiler
 
                 if (conventionExpr.Type != destProp.PropertyType)
                 {
-                    conventionExpr = Expression.Convert(conventionExpr, destProp.PropertyType);
+                    if (TryBuildNestedCollection(
+                            conventionExpr,
+                            destProp.PropertyType,
+                            catalog,
+                            compilationStack,
+                            sharedHolderConstant: holderConstant,
+                            sharedHolderInfo: holderInfo,
+                            out var nestedConv))
+                    {
+                        conventionExpr = nestedConv!;
+                    }
+                    else
+                    {
+                        conventionExpr = Expression.Convert(conventionExpr, destProp.PropertyType);
+                    }
                 }
 
                 bindings.Add(Expression.Bind(destProp, conventionExpr));
@@ -179,5 +207,70 @@ internal sealed class ProjectionCompiler
         {
             compilationStack.Pop();
         }
+    }
+
+    private bool TryBuildNestedCollection(
+        Expression sourceValue,
+        Type destType,
+        IReadOnlyDictionary<TypePair, ITypeMapConfiguration> catalog,
+        Stack<TypePair> stack,
+        ConstantExpression? sharedHolderConstant,
+        HolderTypeInfo? sharedHolderInfo,
+        out Expression? result)
+    {
+        result = null;
+
+        if (!CollectionProjectionBuilder.TryGetElementType(sourceValue.Type, out var srcElem))
+            return false;
+        if (!CollectionProjectionBuilder.TryGetElementType(destType, out var dstElem))
+            return false;
+
+        var elemPair = new TypePair(srcElem, dstElem);
+        if (!catalog.TryGetValue(elemPair, out var elemConfig))
+            return false;
+
+        // Count how many times this pair already appears in the stack (recursion depth)
+        var currentDepth = stack.Count(p => p == elemPair);
+        var elemMaxDepth = elemConfig.MaxDepth ?? int.MaxValue;
+
+        if (currentDepth >= elemMaxDepth)
+        {
+            // Exceeded depth — emit an empty collection
+            result = BuildEmptyCollection(destType, dstElem);
+            return true;
+        }
+
+        var inner = CompileProjection(
+            elemPair,
+            elemConfig.PropertyMaps,
+            elemConfig.CustomConstructor,
+            catalog,
+            stack,
+            elemConfig.MaxDepth,
+            sharedHolderConstant,
+            sharedHolderInfo);
+
+        var elemParam = Expression.Parameter(srcElem, "e");
+        var innerLambda = inner.Projection;
+        var innerBody = ParameterReplacer.Replace(innerLambda.Body, innerLambda.Parameters[0], elemParam);
+
+        var elementLambda = Expression.Lambda(innerBody, elemParam);
+        result = CollectionProjectionBuilder.BuildSelect(sourceValue, elementLambda, destType);
+        return true;
+    }
+
+    private static Expression BuildEmptyCollection(Type destType, Type elementType)
+    {
+        if (destType.IsArray)
+        {
+            var arrayEmpty = typeof(Array).GetMethod(nameof(Array.Empty))!.MakeGenericMethod(elementType);
+            return Expression.Call(arrayEmpty);
+        }
+        // List<T>, ICollection<T>, IEnumerable<T>, IReadOnlyList<T>, etc.
+        var listType = typeof(List<>).MakeGenericType(elementType);
+        Expression newList = Expression.New(listType);
+        if (destType != listType)
+            newList = Expression.Convert(newList, destType);
+        return newList;
     }
 }
