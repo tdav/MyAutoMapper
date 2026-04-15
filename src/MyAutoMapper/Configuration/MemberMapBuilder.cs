@@ -23,5 +23,18 @@ internal sealed class MemberMapBuilder<TSource, TDest, TMember> : IMemberOptions
         ParameterizedSourceExpression = sourceExpression;
     }
 
+    public void MapFrom<TSourceMember>(
+        Expression<Func<TSource, TSourceMember>> sourceExpression)
+        => SourceExpression = sourceExpression;
+
+    public void MapFrom<TSourceMember, TParam>(
+        ParameterSlot<TParam> parameter,
+        Expression<Func<TSource, TParam, TSourceMember>> sourceExpression)
+    {
+        HasParameterizedSource = true;
+        ParameterSlot = parameter;
+        ParameterizedSourceExpression = sourceExpression;
+    }
+
     public void Ignore() => IsIgnored = true;
 }
