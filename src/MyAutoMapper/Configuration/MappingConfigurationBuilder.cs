@@ -32,7 +32,9 @@ public sealed class MappingConfigurationBuilder
     public MappingConfigurationBuilder AddProfiles(Assembly assembly)
     {
         var profileTypes = assembly.GetTypes()
-            .Where(t => typeof(MappingProfile).IsAssignableFrom(t) && !t.IsAbstract);
+            .Where(t => typeof(MappingProfile).IsAssignableFrom(t)
+                     && !t.IsAbstract
+                     && t.DeclaringType is null);
 
         foreach (var type in profileTypes)
         {

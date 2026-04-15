@@ -22,7 +22,7 @@ public class LocalizedProductProfile : MappingProfile
 
         CreateMap<Product, ProductLocalizedDto>()
             .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
-            .ForMember(d => d.LocalizedName, o => o.MapFrom(lang,
+            .ForMember(d => d.LocalizedName, o => o.MapFrom<string>(lang,
                 (src, l) => l == "en" ? src.NameEn :
                             l == "fr" ? src.NameFr :
                             src.NameDefault))
