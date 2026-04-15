@@ -399,3 +399,4 @@ backup_*.sql
 video-archive/
 
 /nul
+.claude/worktrees/
