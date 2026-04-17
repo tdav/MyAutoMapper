@@ -1,4 +1,4 @@
-# MyAutoMapper
+# SmAutoMapper
 
 > **[Русская версия (README-ru.md)](README-ru.md)**
 
@@ -192,7 +192,7 @@ All mappings validated at registration. On errors: `MappingValidationException` 
 
 ## How Parameterized Projections Work
 
-This is the library's key innovation. Common approaches (string interpolation, constant replacement) break EF Core's query plan cache. MyAutoMapper uses the closure pattern — the same one the C# compiler generates for closures.
+This is the library's key innovation. Common approaches (string interpolation, constant replacement) break EF Core's query plan cache. SmAutoMapper uses the closure pattern — the same one the C# compiler generates for closures.
 
 ### Configuration Phase
 
@@ -232,7 +232,7 @@ This is the library's key innovation. Common approaches (string interpolation, c
 
 ## Example: Web API with Localization
 
-The project `samples/MyAutoMapper.WebApiSample` is a working ASP.NET Core Web API with EF Core SQLite and parameterized localization.
+The project `samples/SmAutoMapper.WebApiSample` is a working ASP.NET Core Web API with EF Core SQLite and parameterized localization.
 
 ### Profile
 
@@ -323,7 +323,7 @@ a single SQL query.
 ### Running the Example
 
 ```bash
-cd samples/MyAutoMapper.WebApiSample
+cd samples/SmAutoMapper.WebApiSample
 dotnet run
 # Swagger UI: http://localhost:5000/swagger
 ```
@@ -344,10 +344,10 @@ dotnet run
 
 ```bash
 # Unit tests
-dotnet test tests/MyAutoMapper.UnitTests
+dotnet test tests/SmAutoMapper.UnitTests
 
 # Integration tests (EF Core SQLite)
-dotnet test tests/MyAutoMapper.IntegrationTests
+dotnet test tests/SmAutoMapper.IntegrationTests
 
 # All tests
 dotnet test
@@ -355,10 +355,10 @@ dotnet test
 
 ## Benchmarks
 
-Compares **MyAutoMapper** vs **AutoMapper** (16.1.1) vs **Mapster** (10.0.3) vs manual mapping.
+Compares **SmAutoMapper** vs **AutoMapper** (16.1.1) vs **Mapster** (10.0.3) vs manual mapping.
 
 ```bash
-cd tests/MyAutoMapper.Benchmarks
+cd tests/SmAutoMapper.Benchmarks
 
 # All benchmarks (5-15 min)
 dotnet run -c Release -- --filter *
@@ -400,13 +400,13 @@ dotnet build
 dotnet test
 
 # Run Web API example
-cd samples/MyAutoMapper.WebApiSample
+cd samples/SmAutoMapper.WebApiSample
 dotnet run
 
 # Pack for NuGet
 dotnet pack -c Release
 
-dotnet pack src/MyAutoMapper/SmAutoMapper.csproj -c Release -o ./nupkg
+dotnet pack src/SmAutoMapper/SmAutoMapper.csproj -c Release -o ./nupkg
 ```
 
 ## License
