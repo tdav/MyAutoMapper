@@ -27,6 +27,8 @@ public static class QueryableExtensions
         => SelectCache.GetOrAdd((sourceType, destType),
             key => SelectDefinition.MakeGenericMethod(key.Source, key.Dest));
 
+    [Obsolete("Use ProjectTo<TDest>(IQueryable, IProjectionProvider) and inject IProjectionProvider via DI.",
+              DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TDest>(this IQueryable source)
     {
 #pragma warning disable SMAM0001 // legacy entry point — preserved for 1.x compat; removal in 2.0
@@ -36,6 +38,8 @@ public static class QueryableExtensions
         return BuildQuery<TDest>(source, projection);
     }
 
+    [Obsolete("Use ProjectTo<TDest>(IQueryable, IProjectionProvider, Action<IParameterBinder>) and inject IProjectionProvider via DI.",
+              DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TDest>(
         this IQueryable source,
         Action<IParameterBinder> parameters)
@@ -57,6 +61,8 @@ public static class QueryableExtensions
         return source.Provider.CreateQuery<TDest>(call);
     }
 
+    [Obsolete("Use ProjectTo<TSource, TDest>(IQueryable<TSource>, IProjectionProvider) and inject IProjectionProvider via DI.",
+              DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(this IQueryable<TSource> source)
     {
 #pragma warning disable SMAM0001 // legacy entry point — preserved for 1.x compat; removal in 2.0
@@ -65,6 +71,8 @@ public static class QueryableExtensions
         return source.Select(expression);
     }
 
+    [Obsolete("Use ProjectTo<TSource, TDest>(IQueryable<TSource>, IProjectionProvider, Action<IParameterBinder>) and inject IProjectionProvider via DI.",
+              DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
         this IQueryable<TSource> source,
         Action<IParameterBinder> parameters)

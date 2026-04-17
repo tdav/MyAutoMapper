@@ -4,6 +4,8 @@ using SmAutoMapper.WebApiSample.Data;
 using SmAutoMapper.WebApiSample.ViewModels;
 using SmAutoMapper.Extensions;
 
+#pragma warning disable SMAM0002 // sample intentionally demonstrates legacy single-generic ProjectTo; migrate in 2.0
+
 namespace SmAutoMapper.WebApiSample.Controllers;
 
 [ApiController]
@@ -60,3 +62,5 @@ public class ProductsController(AppDbContext db) : ControllerBase
         return Ok(products);
     }
 }
+
+#pragma warning restore SMAM0002

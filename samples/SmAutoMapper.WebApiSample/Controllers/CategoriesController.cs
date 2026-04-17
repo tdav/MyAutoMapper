@@ -5,6 +5,8 @@ using SmAutoMapper.WebApiSample.ViewModels;
 using SmAutoMapper.Extensions;
 using SmAutoMapper.Runtime;
 
+#pragma warning disable SMAM0002 // sample intentionally demonstrates legacy single-generic ProjectTo; migrate in 2.0
+
 namespace SmAutoMapper.WebApiSample.Controllers;
 
 [ApiController]
@@ -58,3 +60,5 @@ public class CategoriesController : ControllerBase
 
 
 }
+
+#pragma warning restore SMAM0002
