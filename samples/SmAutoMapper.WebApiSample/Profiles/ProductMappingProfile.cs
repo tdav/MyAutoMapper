@@ -1,8 +1,8 @@
-using MyAutoMapper.WebApiSample.Entities;
-using MyAutoMapper.WebApiSample.ViewModels;
+using SmAutoMapper.WebApiSample.Entities;
+using SmAutoMapper.WebApiSample.ViewModels;
 using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.WebApiSample.Profiles;
+namespace SmAutoMapper.WebApiSample.Profiles;
 
 /// <summary>
 /// Parameterized projection: Product → ProductViewModel.

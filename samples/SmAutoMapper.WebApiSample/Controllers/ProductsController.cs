@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyAutoMapper.WebApiSample.Data;
-using MyAutoMapper.WebApiSample.ViewModels;
+using SmAutoMapper.WebApiSample.Data;
+using SmAutoMapper.WebApiSample.ViewModels;
 using SmAutoMapper.Extensions;
 
-namespace MyAutoMapper.WebApiSample.Controllers;
+namespace SmAutoMapper.WebApiSample.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

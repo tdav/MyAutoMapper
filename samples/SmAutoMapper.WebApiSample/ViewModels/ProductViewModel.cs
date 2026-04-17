@@ -1,4 +1,4 @@
-namespace MyAutoMapper.WebApiSample.ViewModels;
+namespace SmAutoMapper.WebApiSample.ViewModels;
 
 public class ProductViewModel
 {

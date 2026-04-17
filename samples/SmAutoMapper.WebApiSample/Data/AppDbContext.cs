@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MyAutoMapper.WebApiSample.Entities;
+using SmAutoMapper.WebApiSample.Entities;
 
-namespace MyAutoMapper.WebApiSample.Data;
+namespace SmAutoMapper.WebApiSample.Data;
 
 public class AppDbContext : DbContext
 {

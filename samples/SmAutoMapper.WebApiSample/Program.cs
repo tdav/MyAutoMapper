@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using MyAutoMapper.WebApiSample.Data;
-using MyAutoMapper.WebApiSample.Profiles;
+using SmAutoMapper.WebApiSample.Data;
+using SmAutoMapper.WebApiSample.Profiles;
 using SmAutoMapper.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=sample.db"));
 
-// MyAutoMapper — auto-scan assembly for all MappingProfile subclasses
+// SmAutoMapper — auto-scan assembly for all MappingProfile subclasses
 builder.Services.AddMapping(typeof(Program).Assembly);
 
 builder.Services.AddControllers();

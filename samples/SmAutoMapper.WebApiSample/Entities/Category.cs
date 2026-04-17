@@ -1,4 +1,4 @@
-namespace MyAutoMapper.WebApiSample.Entities;
+namespace SmAutoMapper.WebApiSample.Entities;
 
 public class Category
 {
