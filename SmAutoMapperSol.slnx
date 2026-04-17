@@ -3,14 +3,14 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/MyAutoMapper/SmAutoMapper.csproj" />
+    <Project Path="src/SmAutoMapper/SmAutoMapper.csproj" />
   </Folder>
   <Folder Name="/samples/">
-    <Project Path="samples/MyAutoMapper.WebApiSample/MyAutoMapper.WebApiSample.csproj" />
+    <Project Path="samples/SmAutoMapper.WebApiSample/SmAutoMapper.WebApiSample.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/MyAutoMapper.Benchmarks/MyAutoMapper.Benchmarks.csproj" />
-    <Project Path="tests/MyAutoMapper.IntegrationTests/MyAutoMapper.IntegrationTests.csproj" />
-    <Project Path="tests/MyAutoMapper.UnitTests/MyAutoMapper.UnitTests.csproj" />
+    <Project Path="tests/SmAutoMapper.Benchmarks/SmAutoMapper.Benchmarks.csproj" />
+    <Project Path="tests/SmAutoMapper.IntegrationTests/SmAutoMapper.IntegrationTests.csproj" />
+    <Project Path="tests/SmAutoMapper.UnitTests/SmAutoMapper.UnitTests.csproj" />
   </Folder>
 </Solution>
