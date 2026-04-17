@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="MyAutoMapper.UnitTests" />
+    <InternalsVisibleTo Include="SmAutoMapper.UnitTests" />
   </ItemGroup>
 
   <ItemGroup>
