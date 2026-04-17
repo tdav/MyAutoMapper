@@ -18,7 +18,7 @@ public class FlatteningBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        // MyAutoMapper setup — flattening convention handles AddressStreet, AddressCity, etc.
+        // SmAutoMapper setup — flattening convention handles AddressStreet, AddressCity, etc.
         var builder = new MappingConfigurationBuilder();
         builder.AddProfile<MyFlatteningProfile>();
         var config = builder.Build();
@@ -69,7 +69,7 @@ public class FlatteningBenchmark
     }
 
     [Benchmark]
-    public FlattenDest MyAutoMapper()
+    public FlattenDest SmAutoMapper()
     {
         return _myMapper.Map<FlattenSource, FlattenDest>(_source);
     }

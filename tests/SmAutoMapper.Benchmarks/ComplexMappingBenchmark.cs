@@ -18,7 +18,7 @@ public class ComplexMappingBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        // MyAutoMapper setup
+        // SmAutoMapper setup
         var builder = new MappingConfigurationBuilder();
         builder.AddProfile<MyComplexProfile>();
         var config = builder.Build();
@@ -68,7 +68,7 @@ public class ComplexMappingBenchmark
     }
 
     [Benchmark]
-    public ComplexDest MyAutoMapper()
+    public ComplexDest SmAutoMapper()
     {
         return _myMapper.Map<ComplexSource, ComplexDest>(_source);
     }

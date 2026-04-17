@@ -22,7 +22,7 @@ public class SimpleMappingBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        // MyAutoMapper setup
+        // SmAutoMapper setup
         var builder = new MappingConfigurationBuilder();
         builder.AddProfile<MySimpleProfile>();
         var config = builder.Build();
@@ -55,7 +55,7 @@ public class SimpleMappingBenchmark
 
     [Benchmark]
     [BenchmarkCategory("Simple")]
-    public SimpleDest MyAutoMapper()
+    public SimpleDest SmAutoMapper()
     {
         return _myMapper.Map<SimpleSource, SimpleDest>(_source);
     }

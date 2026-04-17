@@ -15,7 +15,7 @@ namespace SmAutoMapper.Benchmarks;
 public class ConfigurationBenchmark
 {
     [Benchmark(Baseline = true)]
-    public object MyAutoMapper_Configure()
+    public object SmAutoMapper_Configure()
     {
         var builder = new MappingConfigurationBuilder();
         builder.AddProfile<ConfigBenchmarkProfile>();
