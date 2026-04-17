@@ -10,6 +10,9 @@
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.5" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.5" />
   </ItemGroup>
+  <ItemGroup Label="Build Dependencies">
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+  </ItemGroup>
   <ItemGroup Label="Test Dependencies">
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="xunit" Version="2.9.3" />

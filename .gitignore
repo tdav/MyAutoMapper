@@ -362,7 +362,7 @@ healthchecksdb
 # ======================
 # Docker
 # ======================
-# Игнорируем volumes Docker
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ volumes Docker
 docker-compose.override.local.yml
 .docker/
 
@@ -372,7 +372,7 @@ docker-compose.override.local.yml
 .env
 .env.local
 .env.*.local
-# Исключение для примера
+# пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 !.env.example
 
 # ======================
@@ -400,3 +400,9 @@ video-archive/
 
 /nul
 .claude/worktrees/
+
+# ======================
+# NuGet pack output
+# ======================
+nupkg/
+*.snupkg
