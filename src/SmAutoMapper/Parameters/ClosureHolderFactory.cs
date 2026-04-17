@@ -12,7 +12,7 @@ internal sealed class ClosureHolderFactory
 
     static ClosureHolderFactory()
     {
-        var assemblyName = new AssemblyName("MyAutoMapper.DynamicHolders");
+        var assemblyName = new AssemblyName("SmAutoMapper.DynamicHolders");
         var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
             assemblyName, AssemblyBuilderAccess.Run);
         ModuleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
