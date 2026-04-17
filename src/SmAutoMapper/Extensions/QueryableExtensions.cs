@@ -85,6 +85,25 @@ public static class QueryableExtensions
         return source.Select(expression);
     }
 
+    public static IQueryable<TDest> ProjectTo<TDest>(
+        this IQueryable source,
+        IProjectionProvider provider)
+    {
+        var projection = provider.GetProjection(source.ElementType, typeof(TDest));
+        return BuildQuery<TDest>(source, projection);
+    }
+
+    public static IQueryable<TDest> ProjectTo<TDest>(
+        this IQueryable source,
+        IProjectionProvider provider,
+        Action<IParameterBinder> parameters)
+    {
+        var binder = new ParameterBinder();
+        parameters(binder);
+        var projection = provider.GetProjection(source.ElementType, typeof(TDest), binder);
+        return BuildQuery<TDest>(source, projection);
+    }
+
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
         this IQueryable<TSource> source,
         IProjectionProvider provider)
