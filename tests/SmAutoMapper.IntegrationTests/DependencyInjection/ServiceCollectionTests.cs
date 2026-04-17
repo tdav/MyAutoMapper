@@ -4,7 +4,7 @@ using SmAutoMapper.Compilation;
 using SmAutoMapper.Extensions;
 using SmAutoMapper.Runtime;
 
-namespace MyAutoMapper.IntegrationTests.DependencyInjection;
+namespace SmAutoMapper.IntegrationTests.DependencyInjection;
 
 public class ServiceCollectionTests
 {

@@ -4,7 +4,7 @@ using SmAutoMapper.Configuration;
 using SmAutoMapper.Runtime;
 using SmAutoMapper.Extensions;
 
-namespace MyAutoMapper.IntegrationTests.EfCore;
+namespace SmAutoMapper.IntegrationTests.EfCore;
 
 public class ExplicitCollectionMapFromTests : IDisposable
 {

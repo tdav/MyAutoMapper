@@ -2,7 +2,7 @@ using FluentAssertions;
 using SmAutoMapper.Compilation;
 using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.UnitTests.Compilation;
+namespace SmAutoMapper.UnitTests.Compilation;
 
 public class MapperConfigurationTests
 {

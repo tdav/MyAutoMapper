@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SmAutoMapper.Configuration;
 using SmAutoMapper.Runtime;
 
-namespace MyAutoMapper.Benchmarks;
+namespace SmAutoMapper.Benchmarks;
 
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

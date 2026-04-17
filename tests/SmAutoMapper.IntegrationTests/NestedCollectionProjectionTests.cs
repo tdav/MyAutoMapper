@@ -5,7 +5,7 @@ using SmAutoMapper.Configuration;
 using SmAutoMapper.Extensions;
 using SmAutoMapper.Runtime;
 
-namespace MyAutoMapper.IntegrationTests;
+namespace SmAutoMapper.IntegrationTests;
 
 public class NestedCollectionProjectionTests : IDisposable
 {

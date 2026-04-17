@@ -1,7 +1,7 @@
 using FluentAssertions;
 using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.UnitTests.Conventions;
+namespace SmAutoMapper.UnitTests.Conventions;
 
 public class ConventionMappingTests
 {

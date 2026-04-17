@@ -5,7 +5,7 @@ using SmAutoMapper.Configuration;
 using SmAutoMapper.Compilation;
 using SmAutoMapper.Extensions;
 
-namespace MyAutoMapper.UnitTests.Runtime;
+namespace SmAutoMapper.UnitTests.Runtime;
 
 public class ProjectionProviderTests
 {

@@ -1,4 +1,4 @@
-namespace MyAutoMapper.Benchmarks;
+namespace SmAutoMapper.Benchmarks;
 
 // === Simple flat DTO (3 properties) ===
 public class SimpleSource

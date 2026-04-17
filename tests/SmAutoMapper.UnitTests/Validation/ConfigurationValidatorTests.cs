@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using SmAutoMapper.Validation;
 using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.UnitTests.Validation;
+namespace SmAutoMapper.UnitTests.Validation;
 
 public class ConfigurationValidatorTests
 {

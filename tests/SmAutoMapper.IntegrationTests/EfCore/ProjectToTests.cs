@@ -5,7 +5,7 @@ using SmAutoMapper.Configuration;
 using SmAutoMapper.Extensions;
 using SmAutoMapper.Runtime;
 
-namespace MyAutoMapper.IntegrationTests.EfCore;
+namespace SmAutoMapper.IntegrationTests.EfCore;
 
 public class ProjectToTests : IDisposable
 {

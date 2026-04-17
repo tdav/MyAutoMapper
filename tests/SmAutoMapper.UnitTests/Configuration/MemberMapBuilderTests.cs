@@ -3,7 +3,7 @@ using FluentAssertions;
 using SmAutoMapper.Configuration;
 using SmAutoMapper.Parameters;
 
-namespace MyAutoMapper.UnitTests.Configuration;
+namespace SmAutoMapper.UnitTests.Configuration;
 
 public class MemberMapBuilderTests
 {

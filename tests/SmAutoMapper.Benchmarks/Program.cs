@@ -1,5 +1,5 @@
 using BenchmarkDotNet.Running;
-using MyAutoMapper.Benchmarks;
+using SmAutoMapper.Benchmarks;
 
 BenchmarkSwitcher
     .FromAssembly(typeof(SimpleMappingBenchmark).Assembly)

@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using FluentAssertions;
 using SmAutoMapper.Compilation;
 
-namespace MyAutoMapper.UnitTests.Compilation;
+namespace SmAutoMapper.UnitTests.Compilation;
 
 public class CollectionProjectionBuilderTests
 {

@@ -4,7 +4,7 @@ using Mapster;
 using Microsoft.Extensions.Logging.Abstractions;
 using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.Benchmarks;
+namespace SmAutoMapper.Benchmarks;
 
 /// <summary>
 /// Measures the one-time cost of configuring each mapper library

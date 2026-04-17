@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace MyAutoMapper.IntegrationTests.EfCore;
+namespace SmAutoMapper.IntegrationTests.EfCore;
 
 public class TestDbContext : DbContext
 {

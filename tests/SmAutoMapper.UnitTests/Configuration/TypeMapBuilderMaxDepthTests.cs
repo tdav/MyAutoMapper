@@ -1,7 +1,7 @@
 using FluentAssertions;
 using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.UnitTests.Configuration;
+namespace SmAutoMapper.UnitTests.Configuration;
 
 public class TypeMapBuilderMaxDepthTests
 {

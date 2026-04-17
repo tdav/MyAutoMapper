@@ -1,4 +1,4 @@
-namespace MyAutoMapper.UnitTests;
+namespace SmAutoMapper.UnitTests;
 
 public class SimpleSource
 {

@@ -1,7 +1,7 @@
 using SmAutoMapper.Parameters;
 using SmAutoMapper.Configuration;
 
-namespace MyAutoMapper.IntegrationTests.EfCore;
+namespace SmAutoMapper.IntegrationTests.EfCore;
 
 public class ProductProfile : MappingProfile
 {
