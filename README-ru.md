@@ -1,4 +1,4 @@
-# MyAutoMapper
+# SmAutoMapper
 
 > **[English version (README.md)](README.md)**
 
@@ -194,7 +194,7 @@ builder.Services.AddMapping(
 
 ## Как работают параметризованные проекции
 
-Это ключевая инновация библиотеки. Обычные подходы (string interpolation, замена констант) ломают кэш планов запросов EF Core. MyAutoMapper использует closure-паттерн — тот же, что C# компилятор генерирует для замыканий.
+Это ключевая инновация библиотеки. Обычные подходы (string interpolation, замена констант) ломают кэш планов запросов EF Core. SmAutoMapper использует closure-паттерн — тот же, что C# компилятор генерирует для замыканий.
 
 ### Этап конфигурации
 
@@ -234,7 +234,7 @@ builder.Services.AddMapping(
 
 ## Пример: Web API с локализацией
 
-Проект `samples/MyAutoMapper.WebApiSample` — рабочий пример ASP.NET Core Web API с EF Core SQLite и параметризованной локализацией.
+Проект `samples/SmAutoMapper.WebApiSample` — рабочий пример ASP.NET Core Web API с EF Core SQLite и параметризованной локализацией.
 
 ### Профиль
 
@@ -325,7 +325,7 @@ SQL-запросом.
 ### Запуск примера
 
 ```bash
-cd samples/MyAutoMapper.WebApiSample
+cd samples/SmAutoMapper.WebApiSample
 dotnet run
 # Swagger UI: http://localhost:5000/swagger
 ```
@@ -346,10 +346,10 @@ dotnet run
 
 ```bash
 # Unit-тесты
-dotnet test tests/MyAutoMapper.UnitTests
+dotnet test tests/SmAutoMapper.UnitTests
 
 # Интеграционные тесты (EF Core SQLite)
-dotnet test tests/MyAutoMapper.IntegrationTests
+dotnet test tests/SmAutoMapper.IntegrationTests
 
 # Все тесты
 dotnet test
@@ -357,10 +357,10 @@ dotnet test
 
 ## Бенчмарки
 
-Сравнение **MyAutoMapper** vs **AutoMapper** (16.1.1) vs **Mapster** (10.0.3) vs ручной маппинг.
+Сравнение **SmAutoMapper** vs **AutoMapper** (16.1.1) vs **Mapster** (10.0.3) vs ручной маппинг.
 
 ```bash
-cd tests/MyAutoMapper.Benchmarks
+cd tests/SmAutoMapper.Benchmarks
 
 # Все бенчмарки (5-15 мин)
 dotnet run -c Release -- --filter *
@@ -386,7 +386,7 @@ dotnet build
 dotnet test
 
 # Запуск Web API примера
-cd samples/MyAutoMapper.WebApiSample
+cd samples/SmAutoMapper.WebApiSample
 dotnet run
 
 # Упаковка для NuGet
