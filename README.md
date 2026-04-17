@@ -409,6 +409,39 @@ dotnet pack -c Release
 dotnet pack src/SmAutoMapper/SmAutoMapper.csproj -c Release -o ./nupkg
 ```
 
+## Migrating from 1.0.x
+
+Release 1.1.0 introduces two compile-time deprecation warnings for consumers still using the service-locator path:
+
+- **SMAM0001** — `ProjectionProviderAccessor` is deprecated. Inject `IProjectionProvider` via DI instead.
+- **SMAM0002** — Single-generic `ProjectTo<TDest>(IQueryable)` overloads are deprecated. Use the overloads that take an explicit `IProjectionProvider`.
+
+### Before (1.0.x)
+
+```csharp
+services.AddMapping(cfg => cfg.AddProfile<UserProfile>());
+
+// in a query:
+var dtos = db.Users.ProjectTo<UserDto>().ToList();
+```
+
+### After (1.1.0+)
+
+```csharp
+services.AddMapping(cfg => cfg.AddProfile<UserProfile>());
+
+// in a query (inject IProjectionProvider via constructor):
+public sealed class UserService(IProjectionProvider projectionProvider, AppDbContext db)
+{
+    public List<UserDto> GetAll() =>
+        db.Users.ProjectTo<User, UserDto>(projectionProvider).ToList();
+}
+```
+
+Deprecated paths continue to work in 1.x but will be removed in 2.0. Both diagnostic IDs can be suppressed locally with `#pragma warning disable SMAM0001, SMAM0002` during a staged migration.
+
+---
+
 ## License
 
 MIT
