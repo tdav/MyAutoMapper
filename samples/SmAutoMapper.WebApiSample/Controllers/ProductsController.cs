@@ -1,18 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmAutoMapper.WebApiSample.Data;
+using SmAutoMapper.WebApiSample.Entities;
 using SmAutoMapper.WebApiSample.ViewModels;
 using SmAutoMapper.Extensions;
-
-#pragma warning disable SMAM0002 // sample intentionally demonstrates legacy single-generic ProjectTo; migrate in 2.0
+using SmAutoMapper.Runtime;
 
 namespace SmAutoMapper.WebApiSample.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController(AppDbContext db) : ControllerBase
+public class ProductsController : ControllerBase
 {
-    private readonly AppDbContext _db = db;
+    private readonly AppDbContext _db;
+    private readonly IProjectionProvider _projections;
+
+    public ProductsController(AppDbContext db, IProjectionProvider projections)
+    {
+        _db = db;
+        _projections = projections;
+    }
 
     /// <summary>
     /// GET /api/products?lang=ru
@@ -23,7 +30,8 @@ public class ProductsController(AppDbContext db) : ControllerBase
     public async Task<IActionResult> GetAll([FromQuery] string lang = "ru")
     {
         var products = await _db.Products
-            .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
+            .ProjectTo<Product, ProductViewModel>(_projections,
+                p => p.Set("lang", lang))
             .ToListAsync();
 
         return Ok(products);
@@ -38,7 +46,8 @@ public class ProductsController(AppDbContext db) : ControllerBase
     {
         var product = await _db.Products
             .Where(p => p.Id == id)
-            .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
+            .ProjectTo<Product, ProductViewModel>(_projections,
+                p => p.Set("lang", lang))
             .FirstOrDefaultAsync();
 
         if (product is null)
@@ -56,11 +65,10 @@ public class ProductsController(AppDbContext db) : ControllerBase
     {
         var products = await _db.Products
             .Where(p => p.CategoryId == categoryId)
-            .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
+            .ProjectTo<Product, ProductViewModel>(_projections,
+                p => p.Set("lang", lang))
             .ToListAsync();
 
         return Ok(products);
     }
 }
-
-#pragma warning restore SMAM0002
