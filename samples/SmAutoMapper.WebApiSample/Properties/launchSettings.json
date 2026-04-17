@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "MyAutoMapper.WebApiSample": {
+    "SmAutoMapper.WebApiSample": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

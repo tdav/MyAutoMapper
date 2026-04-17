@@ -41,7 +41,7 @@ jobs:
 
       - name: Pack
         run: |
-          dotnet pack src/MyAutoMapper/SmAutoMapper.csproj \
+          dotnet pack src/SmAutoMapper/SmAutoMapper.csproj \
             -c Release \
             --no-build \
             -p:Version=${{ steps.version.outputs.VERSION }} \
