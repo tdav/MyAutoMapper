@@ -29,8 +29,10 @@ public static class QueryableExtensions
 
     public static IQueryable<TDest> ProjectTo<TDest>(this IQueryable source)
     {
+#pragma warning disable SMAM0001 // legacy entry point — preserved for 1.x compat; removal in 2.0
         var projection = ProjectionProviderAccessor.Instance
             .GetProjection(source.ElementType, typeof(TDest));
+#pragma warning restore SMAM0001
         return BuildQuery<TDest>(source, projection);
     }
 
@@ -40,8 +42,10 @@ public static class QueryableExtensions
     {
         var binder = new ParameterBinder();
         parameters(binder);
+#pragma warning disable SMAM0001 // legacy entry point — preserved for 1.x compat; removal in 2.0
         var projection = ProjectionProviderAccessor.Instance
             .GetProjection(source.ElementType, typeof(TDest), binder);
+#pragma warning restore SMAM0001
         return BuildQuery<TDest>(source, projection);
     }
 
@@ -55,7 +59,9 @@ public static class QueryableExtensions
 
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(this IQueryable<TSource> source)
     {
+#pragma warning disable SMAM0001 // legacy entry point — preserved for 1.x compat; removal in 2.0
         var expression = ProjectionProviderAccessor.Instance.GetProjection<TSource, TDest>();
+#pragma warning restore SMAM0001
         return source.Select(expression);
     }
 
@@ -65,7 +71,9 @@ public static class QueryableExtensions
     {
         var binder = new ParameterBinder();
         parameters(binder);
+#pragma warning disable SMAM0001 // legacy entry point — preserved for 1.x compat; removal in 2.0
         var expression = ProjectionProviderAccessor.Instance.GetProjection<TSource, TDest>(binder);
+#pragma warning restore SMAM0001
         return source.Select(expression);
     }
 

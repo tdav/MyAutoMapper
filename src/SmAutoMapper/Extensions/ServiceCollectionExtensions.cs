@@ -35,7 +35,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(configuration);
         services.AddSingleton<IMapper>(sp => sp.GetRequiredService<MapperConfiguration>().CreateMapper());
         var projectionProvider = configuration.CreateProjectionProvider();
+#pragma warning disable SMAM0001 // populate legacy accessor for 1.x consumers still using single-generic ProjectTo
         ProjectionProviderAccessor.SetInstance(projectionProvider);
+#pragma warning restore SMAM0001
         services.AddSingleton<IProjectionProvider>(projectionProvider);
 
         return services;
