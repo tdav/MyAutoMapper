@@ -1,13 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Compilation.Conventions;
 
 internal interface INameConvention
 {
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     bool TryGetSourceExpression(
         Type sourceType,
         PropertyInfo destProperty,

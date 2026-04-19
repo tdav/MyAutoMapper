@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using SmAutoMapper.Configuration;
+using SmAutoMapper.Internal;
 using SmAutoMapper.Runtime;
 
 namespace SmAutoMapper.Compilation;
@@ -12,8 +13,8 @@ public sealed class MapperConfiguration
     private readonly ProjectionCompiler _projectionCompiler = new();
     private readonly InMemoryCompiler _inMemoryCompiler = new();
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     internal MapperConfiguration(IReadOnlyList<MappingProfile> profiles)
     {
         // Phase 1: collect all ITypeMapConfiguration and build catalog
@@ -62,20 +63,20 @@ public sealed class MapperConfiguration
     internal bool HasTypeMap(Type sourceType, Type destType)
         => _typeMaps.ContainsKey(new TypePair(sourceType, destType));
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public IMapper CreateMapper() => new Mapper(this);
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public IProjectionProvider CreateProjectionProvider() => new ProjectionProvider(this);
 
     internal IReadOnlyCollection<TypeMap> GetAllTypeMaps() => _typeMaps.Values.ToList();
 
     internal IReadOnlyCollection<ITypeMapConfiguration> GetAllTypeMapConfigurations() => _typeMapConfigs;
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private void BuildAndRegisterTypeMap(
         ITypeMapConfiguration typeMapConfig,
         IReadOnlyDictionary<TypePair, ITypeMapConfiguration> catalog)

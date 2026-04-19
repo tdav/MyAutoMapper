@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SmAutoMapper.Compilation;
 using SmAutoMapper.Configuration;
+using SmAutoMapper.Internal;
 using SmAutoMapper.Runtime;
 using SmAutoMapper.Validation;
 
@@ -11,16 +12,16 @@ namespace SmAutoMapper.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure = null,
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure, validatorLoggerFactory: null, profileAssemblies);
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure,
@@ -28,15 +29,15 @@ public static class ServiceCollectionExtensions
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure, validatorLoggerFactory, profileAssemblies);
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure: null, validatorLoggerFactory: null, profileAssemblies);
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private static IServiceCollection AddMappingCore(
         IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure,

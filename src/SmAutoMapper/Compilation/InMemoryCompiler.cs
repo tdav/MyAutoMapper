@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Compilation;
 
@@ -9,8 +10,8 @@ internal sealed class InMemoryCompiler
     /// Takes a projection expression and compiles it into a Func delegate
     /// with a null-check wrapper: if source is null, return default.
     /// </summary>
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public Delegate CompileDelegate(TypePair typePair, LambdaExpression projectionExpr)
     {
         var sourceParam = projectionExpr.Parameters[0];

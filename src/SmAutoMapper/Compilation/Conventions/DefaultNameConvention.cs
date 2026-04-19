@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Compilation.Conventions;
 
@@ -8,8 +9,8 @@ namespace SmAutoMapper.Compilation.Conventions;
 
 internal sealed class DefaultNameConvention : INameConvention
 {
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public bool TryGetSourceExpression(
         Type sourceType,
         PropertyInfo destProperty,
@@ -30,8 +31,8 @@ internal sealed class DefaultNameConvention : INameConvention
         return false;
     }
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private static bool IsAssignable(Type sourceType, Type destType)
     {
         if (destType.IsAssignableFrom(sourceType))

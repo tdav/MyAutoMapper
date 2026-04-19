@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using SmAutoMapper.Compilation.Conventions;
 using SmAutoMapper.Configuration;
+using SmAutoMapper.Internal;
 using SmAutoMapper.Parameters;
 
 namespace SmAutoMapper.Compilation;
@@ -20,8 +21,8 @@ internal sealed class ProjectionCompiler
     /// Builds an Expression&lt;Func&lt;TSource, TDest&gt;&gt; from property mappings and configuration.
     /// Returns a CompilationResult without mutating any input.
     /// </summary>
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public CompilationResult CompileProjection(
         TypePair typePair,
         IReadOnlyList<PropertyMap> propertyMaps,
@@ -241,8 +242,8 @@ internal sealed class ProjectionCompiler
         }
     }
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private bool TryBuildNestedCollection(
         Expression sourceValue,
         Type destType,
@@ -292,8 +293,8 @@ internal sealed class ProjectionCompiler
         return true;
     }
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private static Expression BuildEmptyCollection(Type destType, Type elementType)
     {
         if (destType.IsArray)

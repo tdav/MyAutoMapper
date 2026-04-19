@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Compilation;
 
@@ -17,8 +18,8 @@ internal static class CollectionProjectionBuilder
     private static readonly MethodInfo EnumerableToArray =
         typeof(Enumerable).GetMethod(nameof(Enumerable.ToArray))!;
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static Expression BuildSelect(Expression sourceCollection, LambdaExpression elementProjection, Type destType)
     {
         var srcElement = elementProjection.Parameters[0].Type;
@@ -45,8 +46,8 @@ internal static class CollectionProjectionBuilder
         return Expression.Call(toList, call);
     }
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static bool TryGetElementType(Type type, out Type elementType)
     {
         elementType = null!;

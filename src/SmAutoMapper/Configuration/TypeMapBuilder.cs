@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Configuration;
 
@@ -64,8 +65,8 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
         return this;
     }
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public ITypeMappingExpression<TDest, TSource> ReverseMap()
     {
         _reverseMap = new TypeMapBuilder<TDest, TSource>();

@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using SmAutoMapper.Compilation;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Configuration;
 
@@ -14,16 +15,16 @@ public sealed class MappingConfigurationBuilder
         return this;
     }
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public MappingConfigurationBuilder AddProfile<TProfile>() where TProfile : MappingProfile, new()
     {
         _profiles.Add(new TProfile());
         return this;
     }
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public MappingConfigurationBuilder AddProfile(Type profileType)
     {
         if (!typeof(MappingProfile).IsAssignableFrom(profileType) || profileType.IsAbstract)
@@ -34,8 +35,8 @@ public sealed class MappingConfigurationBuilder
         return this;
     }
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public MappingConfigurationBuilder AddProfiles(Assembly assembly)
     {
         var profileTypes = assembly.GetTypes()
@@ -53,8 +54,8 @@ public sealed class MappingConfigurationBuilder
 
     internal IReadOnlyList<MappingProfile> Profiles => _profiles;
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public MapperConfiguration Build()
     {
         return new MapperConfiguration(_profiles);

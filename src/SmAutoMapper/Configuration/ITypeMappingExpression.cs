@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Configuration;
 
@@ -15,8 +16,8 @@ public interface ITypeMappingExpression<TSource, TDest>
     ITypeMappingExpression<TSource, TDest> ConstructUsing(
         Expression<Func<TSource, TDest>> constructor);
 
-    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
-    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     ITypeMappingExpression<TDest, TSource> ReverseMap();
 
     ITypeMappingExpression<TSource, TDest> MaxDepth(int depth);
