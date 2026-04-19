@@ -30,28 +30,28 @@ public sealed class ProjectionProvider : IProjectionProvider
                 $"No projection expression compiled for {typeof(TSource).Name} -> {typeof(TDest).Name}.");
 
         // If no parameterized mappings, return the cached expression as-is
-        if (typeMap.ClosureHolderType is null || typeMap.HolderPropertyMap is null)
+        if (typeMap.HolderTypeInfo is null)
         {
             return (Expression<Func<TSource, TDest>>)typeMap.ProjectionExpression;
         }
 
-        // Create a new holder instance using the cached HolderPropertyMap (no runtime reflection)
-        var holderType = typeMap.ClosureHolderType;
-        var newHolder = Activator.CreateInstance(holderType)!;
+        // Create a new holder instance using IL-compiled Factory + Setters (no runtime reflection)
+        var holderInfo = typeMap.HolderTypeInfo;
+        var newHolder = holderInfo.Factory();
 
         foreach (var (name, value) in parameters.Values)
         {
-            if (typeMap.HolderPropertyMap.TryGetValue(name, out var property))
+            if (holderInfo.Setters.TryGetValue(name, out var setter))
             {
                 // Allow null values — don't skip them
-                property.SetValue(newHolder, value);
+                setter(newHolder, value);
             }
         }
 
         // Use ClosureValueInjector to swap the holder constant in the expression
         return ClosureValueInjector.InjectParameters<TSource, TDest>(
             (Expression<Func<TSource, TDest>>)typeMap.ProjectionExpression,
-            holderType,
+            holderInfo.HolderType,
             newHolder);
     }
 
@@ -72,28 +72,28 @@ public sealed class ProjectionProvider : IProjectionProvider
                 $"No projection expression compiled for {sourceType.Name} -> {destType.Name}.");
 
         // If no parameterized mappings, return the cached expression as-is
-        if (typeMap.ClosureHolderType is null || typeMap.HolderPropertyMap is null)
+        if (typeMap.HolderTypeInfo is null)
         {
             return typeMap.ProjectionExpression;
         }
 
-        // Create a new holder instance using the cached HolderPropertyMap (no runtime reflection)
-        var holderType = typeMap.ClosureHolderType;
-        var newHolder = Activator.CreateInstance(holderType)!;
+        // Create a new holder instance using IL-compiled Factory + Setters (no runtime reflection)
+        var holderInfo = typeMap.HolderTypeInfo;
+        var newHolder = holderInfo.Factory();
 
         foreach (var (name, value) in parameters.Values)
         {
-            if (typeMap.HolderPropertyMap.TryGetValue(name, out var property))
+            if (holderInfo.Setters.TryGetValue(name, out var setter))
             {
                 // Allow null values — don't skip them
-                property.SetValue(newHolder, value);
+                setter(newHolder, value);
             }
         }
 
         // Use ClosureValueInjector to swap the holder constant in the expression
         return ClosureValueInjector.InjectParameters(
             typeMap.ProjectionExpression,
-            holderType,
+            holderInfo.HolderType,
             newHolder);
     }
 }

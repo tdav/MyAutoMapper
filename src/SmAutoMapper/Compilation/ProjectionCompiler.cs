@@ -229,7 +229,8 @@ internal sealed class ProjectionCompiler
                 projection,
                 holderInfo?.HolderType,
                 defaultHolder,
-                holderInfo?.PropertyMap);
+                holderInfo?.PropertyMap,
+                holderInfo);
         }
         finally
         {
