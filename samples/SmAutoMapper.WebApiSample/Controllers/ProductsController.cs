@@ -29,10 +29,12 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] string lang = "ru")
     {
+#pragma warning disable IL3050, IL2026
         var products = await _db.Products
             .ProjectTo<Product, ProductViewModel>(_projections,
                 p => p.Set("lang", lang))
             .ToListAsync();
+#pragma warning restore IL3050, IL2026
 
         return Ok(products);
     }
@@ -44,11 +46,13 @@ public class ProductsController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "ru")
     {
+#pragma warning disable IL3050, IL2026
         var product = await _db.Products
             .Where(p => p.Id == id)
             .ProjectTo<Product, ProductViewModel>(_projections,
                 p => p.Set("lang", lang))
             .FirstOrDefaultAsync();
+#pragma warning restore IL3050, IL2026
 
         if (product is null)
             return NotFound();
@@ -63,11 +67,13 @@ public class ProductsController : ControllerBase
     [HttpGet("by-category/{categoryId:int}")]
     public async Task<IActionResult> GetByCategory(int categoryId, [FromQuery] string lang = "ru")
     {
+#pragma warning disable IL3050, IL2026
         var products = await _db.Products
             .Where(p => p.CategoryId == categoryId)
             .ProjectTo<Product, ProductViewModel>(_projections,
                 p => p.Set("lang", lang))
             .ToListAsync();
+#pragma warning restore IL3050, IL2026
 
         return Ok(products);
     }

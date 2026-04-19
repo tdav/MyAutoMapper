@@ -9,8 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=sample.db"));
 
-// SmAutoMapper — auto-scan assembly for all MappingProfile subclasses
+// SmAutoMapper — auto-scan assembly for all MappingProfile subclasses.
+// IL3050/IL2026 are suppressed because this sample targets JIT/non-AOT runtime;
+// consumers enabling AOT should configure a static mapping surface instead.
+#pragma warning disable IL3050, IL2026
 builder.Services.AddMapping(typeof(Program).Assembly);
+#pragma warning restore IL3050, IL2026
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(); // Added SwaggerGen
