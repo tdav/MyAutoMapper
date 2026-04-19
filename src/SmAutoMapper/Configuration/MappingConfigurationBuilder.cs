@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using SmAutoMapper.Compilation;
 
@@ -13,12 +14,16 @@ public sealed class MappingConfigurationBuilder
         return this;
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public MappingConfigurationBuilder AddProfile<TProfile>() where TProfile : MappingProfile, new()
     {
         _profiles.Add(new TProfile());
         return this;
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public MappingConfigurationBuilder AddProfile(Type profileType)
     {
         if (!typeof(MappingProfile).IsAssignableFrom(profileType) || profileType.IsAbstract)
@@ -29,6 +34,8 @@ public sealed class MappingConfigurationBuilder
         return this;
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public MappingConfigurationBuilder AddProfiles(Assembly assembly)
     {
         var profileTypes = assembly.GetTypes()
@@ -46,6 +53,8 @@ public sealed class MappingConfigurationBuilder
 
     internal IReadOnlyList<MappingProfile> Profiles => _profiles;
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public MapperConfiguration Build()
     {
         return new MapperConfiguration(_profiles);
