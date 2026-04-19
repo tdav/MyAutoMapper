@@ -12,15 +12,22 @@ Only external dependency: `Microsoft.Extensions.DependencyInjection.Abstractions
 // 1. Register in DI (Program.cs)
 builder.Services.AddMapping(typeof(Program).Assembly);
 
-// 2. Use anywhere — no injection needed!
-var products = await _db.Products
-    .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
-    .ToListAsync();
+// 2. Inject IProjectionProvider wherever you query
+public class ProductsController(AppDbContext db, IProjectionProvider projections)
+{
+    public async Task<IActionResult> GetAll(string lang)
+    {
+        var products = await db.Products
+            .ProjectTo<Product, ProductViewModel>(projections, p => p.Set("lang", lang))
+            .ToListAsync();
 
-// Or without parameters:
-var categories = await _db.Categories
-    .ProjectTo<CategoryDto>()
-    .ToListAsync();
+        var categories = await db.Categories
+            .ProjectTo<Category, CategoryDto>(projections)
+            .ToListAsync();
+
+        return Ok(new { products, categories });
+    }
+}
 ```
 
 ---
@@ -75,21 +82,21 @@ public class ProductProfile : MappingProfile
 
 ### ProjectTo API
 
-Three levels, from simplest to most explicit:
+Inject `IProjectionProvider` via DI and pass it to every `ProjectTo` call:
 
 ```csharp
-// 1. Single generic parameter (recommended) — TSource inferred at runtime
-source.ProjectTo<ProductDto>();
-source.ProjectTo<ProductDto>(p => p.Set("lang", "ru"));
+// Recommended — IProjectionProvider injected via constructor DI
+source.ProjectTo<Product, ProductDto>(projections);
+source.ProjectTo<Product, ProductDto>(projections, p => p.Set("lang", "ru"));
 
-// 2. Two generic parameters — TSource explicit
-source.ProjectTo<Product, ProductDto>();
-source.ProjectTo<Product, ProductDto>(p => p.Set("lang", "ru"));
-
-// 3. Explicit provider — full control, useful for testing
-source.ProjectTo<Product, ProductDto>(projectionProvider);
-source.ProjectTo<Product, ProductDto>(projectionProvider, p => p.Set("lang", "ru"));
+// Single generic — TSource inferred from the IQueryable element type
+source.ProjectTo<ProductDto>(projections);
+source.ProjectTo<ProductDto>(projections, p => p.Set("lang", "ru"));
 ```
+
+> The legacy overloads without `IProjectionProvider` (`source.ProjectTo<ProductDto>()` etc.) are
+> **deprecated in 1.1.0** (diagnostic `SMAM0002`) and will be removed in 2.0. See
+> [Migrating from 1.0.x](#migrating-from-10x) below.
 
 ### In-Memory Mapping
 
@@ -146,10 +153,10 @@ public class CategoryProfile : MappingProfile
     }
 }
 
-// Controller — one query, full tree:
+// Controller — one query, full tree (IProjectionProvider injected via DI):
 var tree = _db.Categories
     .Where(c => c.ParentId == null)
-    .ProjectTo<CategoryViewModel>()
+    .ProjectTo<Category, CategoryViewModel>(_projections)
     .ToList();
 ```
 
@@ -214,7 +221,7 @@ This is the library's key innovation. Common approaches (string interpolation, c
 
 ```
 1. User calls:
-   _db.Products.ProjectTo<ProductViewModel>(p => p.Set("lang", "ru"))
+   _db.Products.ProjectTo<Product, ProductViewModel>(projections, p => p.Set("lang", "ru"))
 
 2. Library creates a new holder with lang="ru", swaps it in the expression tree.
    Tree shape stays IDENTICAL — only the value changes.
@@ -263,7 +270,7 @@ public class ProductMappingProfile : MappingProfile
 public async Task<IActionResult> GetAll([FromQuery] string lang = "ru")
 {
     var products = await _db.Products
-        .ProjectTo<ProductViewModel>(p => p.Set("lang", lang))
+        .ProjectTo<Product, ProductViewModel>(_projections, p => p.Set("lang", lang))
         .ToListAsync();
 
     return Ok(products);
@@ -306,10 +313,10 @@ public class CategoryViewModelProfile : MappingProfile
     }
 }
 
-// Controller:
+// Controller (IProjectionProvider injected via DI):
 var tree = _db.Categories
     .Where(c => c.ParentId == null)
-    .ProjectTo<CategoryViewModel>(p => p.Set("lang", lang))
+    .ProjectTo<Category, CategoryViewModel>(_projections, p => p.Set("lang", lang))
     .ToList();
 ```
 
