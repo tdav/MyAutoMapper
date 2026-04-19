@@ -1,6 +1,7 @@
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Collections.Concurrent;
 
 namespace SmAutoMapper.Parameters;
 
@@ -95,32 +96,62 @@ internal sealed class HolderTypeInfo
 {
     public Type HolderType { get; }
     public IReadOnlyDictionary<string, PropertyInfo> PropertyMap { get; }
+    public Func<object> Factory { get; }
+    public IReadOnlyDictionary<string, Action<object, object?>> Setters { get; }
 
     public HolderTypeInfo(Type holderType, IReadOnlyDictionary<string, PropertyInfo> propertyMap)
     {
         HolderType = holderType;
         PropertyMap = propertyMap;
+        Factory = CompileFactory(holderType);
+        Setters = CompileSetters(holderType, propertyMap);
     }
 
-    /// <summary>
-    /// Creates a new holder instance with the given parameter values.
-    /// </summary>
     public object CreateInstance(IReadOnlyDictionary<string, object?> parameterValues)
     {
-        var instance = Activator.CreateInstance(HolderType)!;
+        var instance = Factory();
         foreach (var (name, value) in parameterValues)
         {
-            if (PropertyMap.TryGetValue(name, out var property))
+            if (Setters.TryGetValue(name, out var set))
             {
-                property.SetValue(instance, value);
+                set(instance, value);
             }
         }
         return instance;
     }
 
-    /// <summary>
-    /// Creates a default holder instance (all properties have default values).
-    /// </summary>
-    public object CreateDefaultInstance()
-        => Activator.CreateInstance(HolderType)!;
+    public object CreateDefaultInstance() => Factory();
+
+    private static Func<object> CompileFactory(Type holderType)
+    {
+        var ctor = holderType.GetConstructor(Type.EmptyTypes)
+            ?? throw new InvalidOperationException(
+                $"Generated holder type {holderType.FullName} has no parameterless constructor.");
+        var newExpr = Expression.New(ctor);
+        var body = Expression.Convert(newExpr, typeof(object));
+        return Expression.Lambda<Func<object>>(body).Compile();
+    }
+
+    private static IReadOnlyDictionary<string, Action<object, object?>> CompileSetters(
+        Type holderType,
+        IReadOnlyDictionary<string, PropertyInfo> propertyMap)
+    {
+        var result = new Dictionary<string, Action<object, object?>>(propertyMap.Count);
+        foreach (var (name, property) in propertyMap)
+        {
+            var instanceParam = Expression.Parameter(typeof(object), "instance");
+            var valueParam = Expression.Parameter(typeof(object), "value");
+
+            var typedInstance = Expression.Convert(instanceParam, holderType);
+            var typedValue = Expression.Convert(valueParam, property.PropertyType);
+
+            var assign = Expression.Assign(
+                Expression.Property(typedInstance, property),
+                typedValue);
+
+            result[name] = Expression.Lambda<Action<object, object?>>(
+                assign, instanceParam, valueParam).Compile();
+        }
+        return result;
+    }
 }
