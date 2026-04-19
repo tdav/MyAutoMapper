@@ -14,6 +14,25 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure = null,
         params Assembly[] profileAssemblies)
+        => AddMappingCore(services, configure, validatorLoggerFactory: null, profileAssemblies);
+
+    public static IServiceCollection AddMapping(
+        this IServiceCollection services,
+        Action<MappingConfigurationBuilder>? configure,
+        ILoggerFactory? validatorLoggerFactory,
+        params Assembly[] profileAssemblies)
+        => AddMappingCore(services, configure, validatorLoggerFactory, profileAssemblies);
+
+    public static IServiceCollection AddMapping(
+        this IServiceCollection services,
+        params Assembly[] profileAssemblies)
+        => AddMappingCore(services, configure: null, validatorLoggerFactory: null, profileAssemblies);
+
+    private static IServiceCollection AddMappingCore(
+        IServiceCollection services,
+        Action<MappingConfigurationBuilder>? configure,
+        ILoggerFactory? validatorLoggerFactory,
+        Assembly[] profileAssemblies)
     {
         var builder = new MappingConfigurationBuilder();
         configure?.Invoke(builder);
@@ -25,26 +44,20 @@ public static class ServiceCollectionExtensions
 
         var configuration = builder.Build();
 
-        // Validate all mappings eagerly
-        using var tempSp = services.BuildServiceProvider();
-        var logger = tempSp.GetService<ILoggerFactory>()?.CreateLogger<ConfigurationValidator>();
+        var logger = validatorLoggerFactory?.CreateLogger<ConfigurationValidator>();
         var validator = new ConfigurationValidator(logger);
         validator.Validate(configuration.GetAllTypeMaps(), configuration.GetAllTypeMapConfigurations());
 
-        // Register as singletons
         services.AddSingleton(configuration);
         services.AddSingleton<IMapper>(sp => sp.GetRequiredService<MapperConfiguration>().CreateMapper());
         var projectionProvider = configuration.CreateProjectionProvider();
+
+#pragma warning disable SMAM0001 // populate legacy accessor for 1.x consumers still using single-generic ProjectTo
         ProjectionProviderAccessor.SetInstance(projectionProvider);
+#pragma warning restore SMAM0001
+
         services.AddSingleton<IProjectionProvider>(projectionProvider);
 
         return services;
-    }
-
-    public static IServiceCollection AddMapping(
-        this IServiceCollection services,
-        params Assembly[] profileAssemblies)
-    {
-        return AddMapping(services, null, profileAssemblies);
     }
 }

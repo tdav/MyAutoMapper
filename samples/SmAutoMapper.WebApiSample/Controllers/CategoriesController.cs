@@ -34,7 +34,8 @@ public class CategoriesController : ControllerBase
     {
         var tree = _db.Categories
             .Where(c => c.ParentId == null)
-            .ProjectTo<CategoryViewModel>(p => p.Set("lang", lang))
+            .ProjectTo<Category, CategoryViewModel>(_projections,
+                p => p.Set("lang", lang))
             .ToList();
 
         return Ok(tree);

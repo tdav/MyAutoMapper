@@ -393,6 +393,39 @@ dotnet run
 dotnet pack -c Release
 ```
 
+## Миграция с 1.0.x
+
+В версии 1.1.0 появились два предупреждения компилятора о устаревших API для потребителей, использующих путь через service-locator:
+
+- **SMAM0001** — `ProjectionProviderAccessor` устарел. Используйте внедрение `IProjectionProvider` через DI.
+- **SMAM0002** — Перегрузки `ProjectTo<TDest>(IQueryable)` с одним generic-параметром устарели. Используйте перегрузки с явной передачей `IProjectionProvider`.
+
+### До (1.0.x)
+
+```csharp
+services.AddMapping(cfg => cfg.AddProfile<UserProfile>());
+
+// в запросе:
+var dtos = db.Users.ProjectTo<UserDto>().ToList();
+```
+
+### После (1.1.0+)
+
+```csharp
+services.AddMapping(cfg => cfg.AddProfile<UserProfile>());
+
+// в запросе (внедряем IProjectionProvider через конструктор):
+public sealed class UserService(IProjectionProvider projectionProvider, AppDbContext db)
+{
+    public List<UserDto> GetAll() =>
+        db.Users.ProjectTo<User, UserDto>(projectionProvider).ToList();
+}
+```
+
+Устаревшие пути продолжают работать в 1.x, но будут удалены в 2.0. Оба диагностических идентификатора можно подавить локально с помощью `#pragma warning disable SMAM0001, SMAM0002` при поэтапной миграции.
+
+---
+
 ## Лицензия
 
 MIT
