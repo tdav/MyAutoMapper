@@ -10,6 +10,7 @@ namespace SmAutoMapper.UnitTests;
 
 public sealed class QueryableExtensionsProviderOverloadTests
 {
+    // Plain classes (not records): ProjectionCompiler uses Expression.New(type) — parameterless ctor required.
     private sealed class SourceEntity
     {
         public int Id { get; set; }

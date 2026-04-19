@@ -1,5 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SmAutoMapper.Compilation;
 using SmAutoMapper.Configuration;
 using SmAutoMapper.Extensions;
@@ -38,5 +40,26 @@ public sealed class AddMappingBuildServiceProviderRegressionTests
         var act = () => services.AddMapping(cfg => cfg.AddProfile<SrcDstProfile>());
 
         act.Should().NotThrow();
+    }
+
+    // Guards against ASP0000 regression: if AddMapping ever reintroduces services.BuildServiceProvider()
+    // to resolve ILoggerFactory (the common case before PR #3), the sentinel factory below would be invoked
+    // during AddMapping registration, tripping the counter. Using an explicitly-registered ILoggerFactory
+    // with a counting factory gives us an observable probe that fails loudly on regression.
+    [Fact]
+    public void AddMapping_DoesNotResolveILoggerFactoryDuringRegistration()
+    {
+        var services = new ServiceCollection();
+        var loggerFactoryResolveCount = 0;
+        services.AddSingleton<ILoggerFactory>(_ =>
+        {
+            loggerFactoryResolveCount++;
+            return NullLoggerFactory.Instance;
+        });
+
+        services.AddMapping(cfg => cfg.AddProfile<SrcDstProfile>());
+
+        loggerFactoryResolveCount.Should().Be(0,
+            "AddMapping must not call services.BuildServiceProvider() to resolve ILoggerFactory (ASP0000 guard)");
     }
 }
