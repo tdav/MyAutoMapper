@@ -37,16 +37,7 @@ public sealed class ProjectionProvider : IProjectionProvider
 
         // Create a new holder instance using IL-compiled Factory + Setters (no runtime reflection)
         var holderInfo = typeMap.HolderTypeInfo;
-        var newHolder = holderInfo.Factory();
-
-        foreach (var (name, value) in parameters.Values)
-        {
-            if (holderInfo.Setters.TryGetValue(name, out var setter))
-            {
-                // Allow null values — don't skip them
-                setter(newHolder, value);
-            }
-        }
+        var newHolder = holderInfo.CreateInstance(parameters.Values);
 
         // Use ClosureValueInjector to swap the holder constant in the expression
         return ClosureValueInjector.InjectParameters<TSource, TDest>(
@@ -79,16 +70,7 @@ public sealed class ProjectionProvider : IProjectionProvider
 
         // Create a new holder instance using IL-compiled Factory + Setters (no runtime reflection)
         var holderInfo = typeMap.HolderTypeInfo;
-        var newHolder = holderInfo.Factory();
-
-        foreach (var (name, value) in parameters.Values)
-        {
-            if (holderInfo.Setters.TryGetValue(name, out var setter))
-            {
-                // Allow null values — don't skip them
-                setter(newHolder, value);
-            }
-        }
+        var newHolder = holderInfo.CreateInstance(parameters.Values);
 
         // Use ClosureValueInjector to swap the holder constant in the expression
         return ClosureValueInjector.InjectParameters(
