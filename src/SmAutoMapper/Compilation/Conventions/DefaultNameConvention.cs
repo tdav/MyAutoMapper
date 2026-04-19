@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -7,6 +8,8 @@ namespace SmAutoMapper.Compilation.Conventions;
 
 internal sealed class DefaultNameConvention : INameConvention
 {
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public bool TryGetSourceExpression(
         Type sourceType,
         PropertyInfo destProperty,
@@ -27,6 +30,8 @@ internal sealed class DefaultNameConvention : INameConvention
         return false;
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     private static bool IsAssignable(Type sourceType, Type destType)
     {
         if (destType.IsAssignableFrom(sourceType))

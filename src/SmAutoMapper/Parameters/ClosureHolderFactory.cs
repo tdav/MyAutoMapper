@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -11,6 +12,11 @@ internal sealed class ClosureHolderFactory
     private static int _typeCounter;
     private static readonly ConcurrentDictionary<string, HolderTypeInfo> _cache = new();
 
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:RequiresDynamicCode",
+        Justification = "Static initializer is reachable only via public API marked [RequiresDynamicCode]; " +
+                        "the library is IsAotCompatible=false and relies on runtime type generation.")]
     static ClosureHolderFactory()
     {
         var assemblyName = new AssemblyName("SmAutoMapper.DynamicHolders");
@@ -24,6 +30,8 @@ internal sealed class ClosureHolderFactory
     /// Returns HolderTypeInfo containing the generated Type, a factory to create instances,
     /// and a mapping from parameter name to PropertyInfo.
     /// </summary>
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public HolderTypeInfo GetOrCreateHolderType(IReadOnlyList<IParameterSlot> parameterSlots)
     {
         // Create a cache key from sorted parameter names and types
@@ -34,6 +42,8 @@ internal sealed class ClosureHolderFactory
         return _cache.GetOrAdd(key, _ => CreateHolderType(parameterSlots));
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     private static HolderTypeInfo CreateHolderType(IReadOnlyList<IParameterSlot> parameterSlots)
     {
         var typeNum = Interlocked.Increment(ref _typeCounter);
@@ -99,6 +109,8 @@ internal sealed class HolderTypeInfo
     public Func<object> Factory { get; }
     public IReadOnlyDictionary<string, Action<object, object?>> Setters { get; }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public HolderTypeInfo(Type holderType, IReadOnlyDictionary<string, PropertyInfo> propertyMap)
     {
         HolderType = holderType;
@@ -122,6 +134,8 @@ internal sealed class HolderTypeInfo
 
     public object CreateDefaultInstance() => Factory();
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     private static Func<object> CompileFactory(Type holderType)
     {
         var ctor = holderType.GetConstructor(Type.EmptyTypes)
@@ -132,6 +146,8 @@ internal sealed class HolderTypeInfo
         return Expression.Lambda<Func<object>>(body).Compile();
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     private static IReadOnlyDictionary<string, Action<object, object?>> CompileSetters(
         Type holderType,
         IReadOnlyDictionary<string, PropertyInfo> propertyMap)

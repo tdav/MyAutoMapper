@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -5,6 +6,8 @@ namespace SmAutoMapper.Compilation.Conventions;
 
 internal sealed class FlatteningConvention : INameConvention
 {
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public bool TryGetSourceExpression(
         Type sourceType,
         PropertyInfo destProperty,
@@ -15,6 +18,8 @@ internal sealed class FlatteningConvention : INameConvention
         return sourceExpression is not null;
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     private static Expression? TryFlatten(
         Type currentType,
         string remainingName,

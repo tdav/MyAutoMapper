@@ -9,6 +9,12 @@ namespace SmAutoMapper.Extensions;
 
 public static class QueryableExtensions
 {
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:RequiresDynamicCode",
+        Justification = "Field initializer uses MakeGenericType only with primitive Type.MakeGenericMethodParameter " +
+                        "to look up the Queryable.Select<,> method definition; the resulting MethodInfo is " +
+                        "specialized lazily in GetSelectMethod, which is itself marked [RequiresDynamicCode].")]
     private static readonly MethodInfo SelectDefinition =
         typeof(Queryable).GetMethod(
             nameof(Queryable.Select),

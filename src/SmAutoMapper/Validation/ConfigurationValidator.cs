@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
@@ -15,9 +16,13 @@ internal sealed class ConfigurationValidator
         _logger = logger;
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public void Validate(IReadOnlyCollection<TypeMap> typeMaps)
         => Validate(typeMaps, Array.Empty<ITypeMapConfiguration>());
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public void Validate(IReadOnlyCollection<TypeMap> typeMaps, IReadOnlyCollection<ITypeMapConfiguration> configs)
     {
         var errors = new List<string>();
@@ -45,6 +50,8 @@ internal sealed class ConfigurationValidator
         }
     }
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     private void ValidateTypeMap(TypeMap typeMap, List<string> errors)
     {
         var sourceType = typeMap.TypePair.SourceType;
