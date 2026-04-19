@@ -27,7 +27,8 @@ public static class QueryableExtensions
         => SelectCache.GetOrAdd((sourceType, destType),
             key => SelectDefinition.MakeGenericMethod(key.Source, key.Dest));
 
-    [Obsolete("Use ProjectTo<TDest>(IQueryable, IProjectionProvider) and inject IProjectionProvider via DI.",
+    [Obsolete("Use ProjectTo<TDest>(IQueryable, IProjectionProvider) and inject IProjectionProvider via DI. " +
+              "Will be removed in 2.0.",
               DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TDest>(this IQueryable source)
     {
@@ -38,7 +39,8 @@ public static class QueryableExtensions
         return BuildQuery<TDest>(source, projection);
     }
 
-    [Obsolete("Use ProjectTo<TDest>(IQueryable, IProjectionProvider, Action<IParameterBinder>) and inject IProjectionProvider via DI.",
+    [Obsolete("Use ProjectTo<TDest>(IQueryable, IProjectionProvider, Action<IParameterBinder>) and inject IProjectionProvider via DI. " +
+              "Will be removed in 2.0.",
               DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TDest>(
         this IQueryable source,
@@ -61,7 +63,8 @@ public static class QueryableExtensions
         return source.Provider.CreateQuery<TDest>(call);
     }
 
-    [Obsolete("Use ProjectTo<TSource, TDest>(IQueryable<TSource>, IProjectionProvider) and inject IProjectionProvider via DI.",
+    [Obsolete("Use ProjectTo<TSource, TDest>(IQueryable<TSource>, IProjectionProvider) and inject IProjectionProvider via DI. " +
+              "Will be removed in 2.0.",
               DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(this IQueryable<TSource> source)
     {
@@ -71,7 +74,8 @@ public static class QueryableExtensions
         return source.Select(expression);
     }
 
-    [Obsolete("Use ProjectTo<TSource, TDest>(IQueryable<TSource>, IProjectionProvider, Action<IParameterBinder>) and inject IProjectionProvider via DI.",
+    [Obsolete("Use ProjectTo<TSource, TDest>(IQueryable<TSource>, IProjectionProvider, Action<IParameterBinder>) and inject IProjectionProvider via DI. " +
+              "Will be removed in 2.0.",
               DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
         this IQueryable<TSource> source,
@@ -85,38 +89,88 @@ public static class QueryableExtensions
         return source.Select(expression);
     }
 
+    /// <summary>
+    /// Projects the query's elements to <typeparamref name="TDest"/> using the supplied
+    /// <paramref name="provider"/>. Recommended migration target for the legacy accessor-based overload.
+    /// </summary>
+    /// <typeparam name="TDest">Destination type to project to.</typeparam>
+    /// <param name="source">Source queryable whose element type is inferred at runtime.</param>
+    /// <param name="provider">Projection provider obtained from DI (registered by <c>AddMapping</c>).</param>
+    /// <returns>Queryable of <typeparamref name="TDest"/> that composes with EF Core.</returns>
     public static IQueryable<TDest> ProjectTo<TDest>(
         this IQueryable source,
         IProjectionProvider provider)
     {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(provider);
+
         var projection = provider.GetProjection(source.ElementType, typeof(TDest));
         return BuildQuery<TDest>(source, projection);
     }
 
+    /// <summary>
+    /// Projects the query's elements to <typeparamref name="TDest"/> using the supplied
+    /// <paramref name="provider"/> and binds runtime parameters via <paramref name="parameters"/>.
+    /// </summary>
+    /// <typeparam name="TDest">Destination type to project to.</typeparam>
+    /// <param name="source">Source queryable whose element type is inferred at runtime.</param>
+    /// <param name="provider">Projection provider obtained from DI (registered by <c>AddMapping</c>).</param>
+    /// <param name="parameters">Callback that binds named parameters used by the projection.</param>
+    /// <returns>Queryable of <typeparamref name="TDest"/> with parameters applied.</returns>
     public static IQueryable<TDest> ProjectTo<TDest>(
         this IQueryable source,
         IProjectionProvider provider,
         Action<IParameterBinder> parameters)
     {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(provider);
+        ArgumentNullException.ThrowIfNull(parameters);
+
         var binder = new ParameterBinder();
         parameters(binder);
         var projection = provider.GetProjection(source.ElementType, typeof(TDest), binder);
         return BuildQuery<TDest>(source, projection);
     }
 
+    /// <summary>
+    /// Projects an <see cref="IQueryable{TSource}"/> to <typeparamref name="TDest"/> using the supplied
+    /// <paramref name="provider"/>. Preferred strongly-typed migration target.
+    /// </summary>
+    /// <typeparam name="TSource">Source element type.</typeparam>
+    /// <typeparam name="TDest">Destination type to project to.</typeparam>
+    /// <param name="source">Source queryable.</param>
+    /// <param name="provider">Projection provider obtained from DI (registered by <c>AddMapping</c>).</param>
+    /// <returns>Queryable of <typeparamref name="TDest"/> that composes with EF Core.</returns>
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
         this IQueryable<TSource> source,
         IProjectionProvider provider)
     {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(provider);
+
         var expression = provider.GetProjection<TSource, TDest>();
         return source.Select(expression);
     }
 
+    /// <summary>
+    /// Projects an <see cref="IQueryable{TSource}"/> to <typeparamref name="TDest"/> using the supplied
+    /// <paramref name="provider"/> and binds runtime parameters via <paramref name="parameters"/>.
+    /// </summary>
+    /// <typeparam name="TSource">Source element type.</typeparam>
+    /// <typeparam name="TDest">Destination type to project to.</typeparam>
+    /// <param name="source">Source queryable.</param>
+    /// <param name="provider">Projection provider obtained from DI (registered by <c>AddMapping</c>).</param>
+    /// <param name="parameters">Callback that binds named parameters used by the projection.</param>
+    /// <returns>Queryable of <typeparamref name="TDest"/> with parameters applied.</returns>
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
         this IQueryable<TSource> source,
         IProjectionProvider provider,
         Action<IParameterBinder> parameters)
     {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(provider);
+        ArgumentNullException.ThrowIfNull(parameters);
+
         var binder = new ParameterBinder();
         parameters(binder);
         var expression = provider.GetProjection<TSource, TDest>(binder);
