@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Configuration;
 
@@ -63,6 +65,8 @@ internal sealed class TypeMapBuilder<TSource, TDest> : ITypeMappingExpression<TS
         return this;
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public ITypeMappingExpression<TDest, TSource> ReverseMap()
     {
         _reverseMap = new TypeMapBuilder<TDest, TSource>();

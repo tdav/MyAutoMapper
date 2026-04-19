@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Compilation;
 
@@ -16,6 +18,8 @@ internal static class CollectionProjectionBuilder
     private static readonly MethodInfo EnumerableToArray =
         typeof(Enumerable).GetMethod(nameof(Enumerable.ToArray))!;
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static Expression BuildSelect(Expression sourceCollection, LambdaExpression elementProjection, Type destType)
     {
         var srcElement = elementProjection.Parameters[0].Type;
@@ -42,6 +46,8 @@ internal static class CollectionProjectionBuilder
         return Expression.Call(toList, call);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static bool TryGetElementType(Type type, out Type elementType)
     {
         elementType = null!;

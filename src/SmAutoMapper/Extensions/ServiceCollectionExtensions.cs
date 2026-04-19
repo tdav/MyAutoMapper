@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SmAutoMapper.Compilation;
 using SmAutoMapper.Configuration;
+using SmAutoMapper.Internal;
 using SmAutoMapper.Runtime;
 using SmAutoMapper.Validation;
 
@@ -10,12 +12,16 @@ namespace SmAutoMapper.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure = null,
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure, validatorLoggerFactory: null, profileAssemblies);
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure,
@@ -23,11 +29,15 @@ public static class ServiceCollectionExtensions
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure, validatorLoggerFactory, profileAssemblies);
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure: null, validatorLoggerFactory: null, profileAssemblies);
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private static IServiceCollection AddMappingCore(
         IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure,

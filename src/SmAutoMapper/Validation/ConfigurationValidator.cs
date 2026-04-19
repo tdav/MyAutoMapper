@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using SmAutoMapper.Compilation;
 using SmAutoMapper.Configuration;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Validation;
 
@@ -15,9 +17,13 @@ internal sealed class ConfigurationValidator
         _logger = logger;
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public void Validate(IReadOnlyCollection<TypeMap> typeMaps)
         => Validate(typeMaps, Array.Empty<ITypeMapConfiguration>());
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public void Validate(IReadOnlyCollection<TypeMap> typeMaps, IReadOnlyCollection<ITypeMapConfiguration> configs)
     {
         var errors = new List<string>();
@@ -45,6 +51,8 @@ internal sealed class ConfigurationValidator
         }
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private void ValidateTypeMap(TypeMap typeMap, List<string> errors)
     {
         var sourceType = typeMap.TypePair.SourceType;

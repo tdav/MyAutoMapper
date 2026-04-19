@@ -409,6 +409,60 @@ dotnet pack -c Release
 dotnet pack src/SmAutoMapper/SmAutoMapper.csproj -c Release -o ./nupkg
 ```
 
+---
+
+## AOT and Trimming
+
+**SmAutoMapper is not compatible with Native AOT or aggressive trimming.**
+The library generates closure-holder types at runtime via `Reflection.Emit`
+(`AssemblyBuilder.DefineDynamicAssembly`) and compiles projections with
+`Expression.Lambda(...).Compile()`. Both require the JIT and dynamic code
+generation, which Native AOT removes by design.
+
+The package ships with:
+
+- `IsAotCompatible=false` and `IsTrimmable=false` — sets the correct
+  expectation for consumer projects.
+- `EnableAotAnalyzer=true` and `EnableTrimAnalyzer=true` — surfaces
+  `IL3050`, `IL2026`, and related warnings inside the library at build time.
+- `[RequiresDynamicCode]` and `[RequiresUnreferencedCode]` on every public
+  entry point that reaches reflection or dynamic compilation — `AddMapping`,
+  every `ProjectTo` overload, `MapperConfiguration.CreateMapper`,
+  `MapperConfiguration.CreateProjectionProvider`, `MappingProfile.CreateMap`,
+  `MappingConfigurationBuilder.AddProfile*`/`Build`, and
+  `ITypeMappingExpression.ReverseMap`.
+
+### Consuming the library with AOT analyzers on
+
+If your application enables `PublishAot=true` or `EnableAotAnalyzer=true`,
+the compiler will propagate `IL3050` / `IL2026` warnings from the
+SmAutoMapper API up to your call sites. Suppress them locally where you call
+into the library:
+
+```csharp
+#pragma warning disable IL3050, IL2026
+builder.Services.AddMapping(typeof(Program).Assembly);
+#pragma warning restore IL3050, IL2026
+```
+
+```csharp
+#pragma warning disable IL3050, IL2026
+var products = await _db.Products
+    .ProjectTo<Product, ProductViewModel>(_projections,
+        p => p.Set("lang", lang))
+    .ToListAsync();
+#pragma warning restore IL3050, IL2026
+```
+
+The Web API sample (`samples/SmAutoMapper.WebApiSample`) uses this exact
+pattern at every SmAutoMapper call site as a reference.
+
+> If your deployment targets **Native AOT**, SmAutoMapper will fail at
+> runtime — the reflection and emit code paths have no AOT fallback. Use a
+> source-generator-based mapper for AOT scenarios.
+
+---
+
 ## Migrating from 1.0.x
 
 Release 1.1.0 introduces two compile-time deprecation warnings for consumers still using the service-locator path:

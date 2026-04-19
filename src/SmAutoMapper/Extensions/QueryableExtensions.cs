@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SmAutoMapper.Internal;
 using SmAutoMapper.Parameters;
 using SmAutoMapper.Runtime;
 
@@ -8,6 +10,12 @@ namespace SmAutoMapper.Extensions;
 
 public static class QueryableExtensions
 {
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:RequiresDynamicCode",
+        Justification = "Field initializer uses MakeGenericType only with primitive Type.MakeGenericMethodParameter " +
+                        "to look up the Queryable.Select<,> method definition; the resulting MethodInfo is " +
+                        "specialized lazily in GetSelectMethod, which is itself marked [RequiresDynamicCode].")]
     private static readonly MethodInfo SelectDefinition =
         typeof(Queryable).GetMethod(
             nameof(Queryable.Select),
@@ -23,10 +31,14 @@ public static class QueryableExtensions
 
     private static readonly ConcurrentDictionary<(Type Source, Type Dest), MethodInfo> SelectCache = new();
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private static MethodInfo GetSelectMethod(Type sourceType, Type destType)
         => SelectCache.GetOrAdd((sourceType, destType),
             key => SelectDefinition.MakeGenericMethod(key.Source, key.Dest));
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     [Obsolete("Use ProjectTo<TDest>(IQueryable, IProjectionProvider) and inject IProjectionProvider via DI.",
               DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TDest>(this IQueryable source)
@@ -38,6 +50,8 @@ public static class QueryableExtensions
         return BuildQuery<TDest>(source, projection);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     [Obsolete("Use ProjectTo<TDest>(IQueryable, IProjectionProvider, Action<IParameterBinder>) and inject IProjectionProvider via DI.",
               DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TDest>(
@@ -53,6 +67,8 @@ public static class QueryableExtensions
         return BuildQuery<TDest>(source, projection);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private static IQueryable<TDest> BuildQuery<TDest>(
         IQueryable source, LambdaExpression projection)
     {
@@ -61,6 +77,8 @@ public static class QueryableExtensions
         return source.Provider.CreateQuery<TDest>(call);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     [Obsolete("Use ProjectTo<TSource, TDest>(IQueryable<TSource>, IProjectionProvider) and inject IProjectionProvider via DI.",
               DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(this IQueryable<TSource> source)
@@ -71,6 +89,8 @@ public static class QueryableExtensions
         return source.Select(expression);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     [Obsolete("Use ProjectTo<TSource, TDest>(IQueryable<TSource>, IProjectionProvider, Action<IParameterBinder>) and inject IProjectionProvider via DI.",
               DiagnosticId = "SMAM0002")]
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
@@ -85,6 +105,8 @@ public static class QueryableExtensions
         return source.Select(expression);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IQueryable<TDest> ProjectTo<TDest>(
         this IQueryable source,
         IProjectionProvider provider)
@@ -93,6 +115,8 @@ public static class QueryableExtensions
         return BuildQuery<TDest>(source, projection);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IQueryable<TDest> ProjectTo<TDest>(
         this IQueryable source,
         IProjectionProvider provider,
@@ -104,6 +128,8 @@ public static class QueryableExtensions
         return BuildQuery<TDest>(source, projection);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
         this IQueryable<TSource> source,
         IProjectionProvider provider)
@@ -112,6 +138,8 @@ public static class QueryableExtensions
         return source.Select(expression);
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public static IQueryable<TDest> ProjectTo<TSource, TDest>(
         this IQueryable<TSource> source,
         IProjectionProvider provider,

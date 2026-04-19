@@ -32,11 +32,13 @@ public class CategoriesController : ControllerBase
     [HttpGet("tree")]
     public IActionResult GetTree([FromQuery] string lang = "ru")
     {
+#pragma warning disable IL3050, IL2026
         var tree = _db.Categories
             .Where(c => c.ParentId == null)
             .ProjectTo<Category, CategoryViewModel>(_projections,
                 p => p.Set("lang", lang))
             .ToList();
+#pragma warning restore IL3050, IL2026
 
         return Ok(tree);
     }
@@ -49,10 +51,12 @@ public class CategoriesController : ControllerBase
     [HttpGet("flat")]
     public IActionResult GetFlat([FromQuery] string lang = "ru")
     {
+#pragma warning disable IL3050, IL2026
         var categories = _db.Categories
             .ProjectTo<Category, CategoryViewModel>(_projections,
                 p => p.Set("lang", lang))
             .ToList();
+#pragma warning restore IL3050, IL2026
 
         return Ok(categories);
     }

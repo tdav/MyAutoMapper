@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using SmAutoMapper.Internal;
 
 namespace SmAutoMapper.Compilation.Conventions;
 
@@ -7,6 +9,8 @@ namespace SmAutoMapper.Compilation.Conventions;
 
 internal sealed class DefaultNameConvention : INameConvention
 {
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     public bool TryGetSourceExpression(
         Type sourceType,
         PropertyInfo destProperty,
@@ -27,6 +31,8 @@ internal sealed class DefaultNameConvention : INameConvention
         return false;
     }
 
+    [RequiresDynamicCode(AotMessages.DynamicCode)]
+    [RequiresUnreferencedCode(AotMessages.UnreferencedCode)]
     private static bool IsAssignable(Type sourceType, Type destType)
     {
         if (destType.IsAssignableFrom(sourceType))
