@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,12 +11,16 @@ namespace SmAutoMapper.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure = null,
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure, validatorLoggerFactory: null, profileAssemblies);
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure,
@@ -23,11 +28,15 @@ public static class ServiceCollectionExtensions
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure, validatorLoggerFactory, profileAssemblies);
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     public static IServiceCollection AddMapping(
         this IServiceCollection services,
         params Assembly[] profileAssemblies)
         => AddMappingCore(services, configure: null, validatorLoggerFactory: null, profileAssemblies);
 
+    [RequiresDynamicCode("SmAutoMapper uses Reflection.Emit to generate closure holder types at runtime.")]
+    [RequiresUnreferencedCode("SmAutoMapper uses reflection over mapped types; members may be trimmed.")]
     private static IServiceCollection AddMappingCore(
         IServiceCollection services,
         Action<MappingConfigurationBuilder>? configure,
