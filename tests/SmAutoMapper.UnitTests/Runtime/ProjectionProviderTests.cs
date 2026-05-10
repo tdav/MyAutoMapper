@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Threading;
 using FluentAssertions;
 using SmAutoMapper.Parameters;
 using SmAutoMapper.Runtime;
@@ -95,6 +97,69 @@ public class ProjectionProviderTests
         var source = new LocalizedSource { Id = 1, NameEn = "Hello", NameFr = "Bonjour", NameDefault = "Default" };
         funcEn(source).LocalizedName.Should().Be("Hello");
         funcFr(source).LocalizedName.Should().Be("Bonjour");
+    }
+
+    private sealed class PriceSource
+    {
+    }
+
+    private sealed class PriceDest
+    {
+        public int MinPrice { get; set; }
+    }
+
+    private sealed class ConcurrentMinPriceProfile : MappingProfile
+    {
+        public ConcurrentMinPriceProfile()
+        {
+            var minPrice = DeclareParameter<int>("MinPrice");
+
+            CreateMap<PriceSource, PriceDest>()
+                .ForMember(d => d.MinPrice, o => o.MapFrom<int>(minPrice, (s, p) => p));
+        }
+    }
+
+    [Fact]
+    public async Task GetProjection_WithParameters_ReturnsDifferentExpressionsPerValue_Concurrent()
+    {
+        var builder = new MappingConfigurationBuilder();
+        builder.AddProfile<ConcurrentMinPriceProfile>();
+        var config = builder.Build();
+        var provider = config.CreateProjectionProvider();
+
+        const int threadCount = 32;
+        const int iterationsPerThread = 50;
+
+        using var barrier = new Barrier(threadCount);
+        var failures = new ConcurrentBag<string>();
+
+        var tasks = Enumerable.Range(0, threadCount).Select(threadIndex => Task.Run(() =>
+        {
+            barrier.SignalAndWait();
+
+            for (int i = 0; i < iterationsPerThread; i++)
+            {
+                int expectedValue = threadIndex * 1000 + i;
+
+                var binder = new ParameterBinder();
+                binder.Set<int>("MinPrice", expectedValue);
+
+                var expr = provider.GetProjection<PriceSource, PriceDest>(binder);
+                var func = expr.Compile();
+                var result = func(new PriceSource());
+
+                if (result.MinPrice != expectedValue)
+                {
+                    failures.Add(
+                        $"Thread {threadIndex}, iter {i}: expected {expectedValue}, got {result.MinPrice}");
+                }
+            }
+        })).ToArray();
+
+        await Task.WhenAll(tasks);
+
+        failures.Should().BeEmpty(
+            "each thread must see its own parameter value with no cross-thread contamination");
     }
 }
 
